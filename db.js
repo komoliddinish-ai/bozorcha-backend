@@ -33,31 +33,19 @@ db.exec(`
     is_active     INTEGER DEFAULT 1
   );
 
-  CREATE TABLE IF NOT EXISTS cart_items (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    telegram_id   INTEGER NOT NULL,
-    product_id    INTEGER NOT NULL REFERENCES products(id),
-    quantity      INTEGER NOT NULL DEFAULT 1,
-    UNIQUE(telegram_id, product_id)
-  );
-
-  CREATE TABLE IF NOT EXISTS orders (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    telegram_id   INTEGER NOT NULL,
-    total_price   INTEGER NOT NULL,
-    status        TEXT DEFAULT 'new',    -- new -> confirmed -> shipped -> done
-    address       TEXT,
-    phone         TEXT,
-    created_at    TEXT DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS order_items (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id      INTEGER NOT NULL REFERENCES orders(id),
-    product_id    INTEGER NOT NULL,
-    name          TEXT NOT NULL,          -- buyurtma vaqtidagi nom (tarix uchun)
-    price         INTEGER NOT NULL,       -- buyurtma vaqtidagi narx
-    quantity      INTEGER NOT NULL
+  CREATE TABLE IF NOT EXISTS applications (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    telegram_id       INTEGER NOT NULL,
+    customer_name     TEXT NOT NULL,
+    customer_phone    TEXT NOT NULL,
+    product_id        INTEGER NOT NULL,
+    product_name      TEXT NOT NULL,        -- ariza vaqtidagi nom (tarix uchun)
+    base_price        INTEGER NOT NULL,     -- naqd narxi
+    term_months       INTEGER NOT NULL,
+    monthly_payment   INTEGER NOT NULL,
+    total_price       INTEGER NOT NULL,
+    status            TEXT DEFAULT 'new',   -- new -> contacted -> approved -> rejected
+    created_at        TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
 

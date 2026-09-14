@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
-require('./seed'); // baza bo'sh bo'lsa, namunaviy mahsulotlarni avtomatik qo'shadi
+require('./seed'); // baza bo'sh bo'lsa, namunaviy telefonlarni avtomatik qo'shadi
 const { requireTelegramAuth } = require('./auth');
+const { TERM_OPTIONS, calcInstallment } = require('./config');
 
 const app = express();
 app.use(cors());
@@ -43,88 +44,45 @@ app.get('/api/products/:id', (req, res) => {
   res.json(row);
 });
 
-// ---------- Savatcha (auth talab qilinadi) ----------
+// ---------- Bo'lib to'lash muddatlari ----------
+// Frontend shu ro'yxatni ishlatib tugmalarni chizadi va oylik to'lovni hisoblaydi
 
-app.get('/api/cart', auth, (req, res) => {
-  upsertUser(req.telegramUser);
-  const items = db.prepare(`
-    SELECT ci.id, ci.quantity, p.id AS product_id, p.name, p.price, p.image_url
-    FROM cart_items ci JOIN products p ON p.id = ci.product_id
-    WHERE ci.telegram_id = ?
-  `).all(req.telegramUser.id);
-  res.json(items);
+app.get('/api/installment-terms', (req, res) => {
+  res.json(TERM_OPTIONS);
 });
 
-app.post('/api/cart', auth, (req, res) => {
+// ---------- Arizalar ----------
+
+app.post('/api/applications', auth, (req, res) => {
   upsertUser(req.telegramUser);
-  const { product_id, quantity = 1 } = req.body;
+  const { product_id, term_months, customer_name, customer_phone } = req.body;
+
+  if (!customer_name || !customer_phone) {
+    return res.status(400).json({ error: 'Ism va telefon raqam kerak' });
+  }
+
   const product = db.prepare('SELECT * FROM products WHERE id = ?').get(product_id);
   if (!product) return res.status(404).json({ error: 'Mahsulot topilmadi' });
 
-  db.prepare(`
-    INSERT INTO cart_items (telegram_id, product_id, quantity)
-    VALUES (?, ?, ?)
-    ON CONFLICT(telegram_id, product_id) DO UPDATE SET quantity = quantity + excluded.quantity
-  `).run(req.telegramUser.id, product_id, quantity);
+  const plan = calcInstallment(product.price, term_months);
+  if (!plan) return res.status(400).json({ error: 'Muddat noto\'g\'ri' });
 
-  res.status(201).json({ ok: true });
+  const result = db.prepare(`
+    INSERT INTO applications
+      (telegram_id, customer_name, customer_phone, product_id, product_name, base_price, term_months, monthly_payment, total_price)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    req.telegramUser.id, customer_name, customer_phone,
+    product.id, product.name, product.price,
+    plan.months, plan.monthly_payment, plan.total_price
+  );
+
+  res.status(201).json({ application_id: result.lastInsertRowid, ...plan });
 });
 
-app.patch('/api/cart/:itemId', auth, (req, res) => {
-  const { quantity } = req.body;
-  if (quantity <= 0) {
-    db.prepare('DELETE FROM cart_items WHERE id = ? AND telegram_id = ?').run(req.params.itemId, req.telegramUser.id);
-  } else {
-    db.prepare('UPDATE cart_items SET quantity = ? WHERE id = ? AND telegram_id = ?')
-      .run(quantity, req.params.itemId, req.telegramUser.id);
-  }
-  res.json({ ok: true });
-});
-
-app.delete('/api/cart/:itemId', auth, (req, res) => {
-  db.prepare('DELETE FROM cart_items WHERE id = ? AND telegram_id = ?').run(req.params.itemId, req.telegramUser.id);
-  res.json({ ok: true });
-});
-
-// ---------- Buyurtmalar ----------
-
-app.post('/api/orders', auth, (req, res) => {
-  upsertUser(req.telegramUser);
-  const { address, phone } = req.body;
-  const items = db.prepare(`
-    SELECT ci.quantity, p.id AS product_id, p.name, p.price
-    FROM cart_items ci JOIN products p ON p.id = ci.product_id
-    WHERE ci.telegram_id = ?
-  `).all(req.telegramUser.id);
-
-  if (items.length === 0) return res.status(400).json({ error: 'Savatcha bo\'sh' });
-
-  const total = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
-
-  const insertOrder = db.transaction(() => {
-    const orderId = db.prepare(`
-      INSERT INTO orders (telegram_id, total_price, address, phone)
-      VALUES (?, ?, ?, ?)
-    `).run(req.telegramUser.id, total, address || '', phone || '').lastInsertRowid;
-
-    const insertItem = db.prepare(`
-      INSERT INTO order_items (order_id, product_id, name, price, quantity)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    for (const it of items) {
-      insertItem.run(orderId, it.product_id, it.name, it.price, it.quantity);
-    }
-    db.prepare('DELETE FROM cart_items WHERE telegram_id = ?').run(req.telegramUser.id);
-    return orderId;
-  });
-
-  const orderId = insertOrder();
-  res.status(201).json({ order_id: orderId, total_price: total });
-});
-
-app.get('/api/orders', auth, (req, res) => {
-  const orders = db.prepare('SELECT * FROM orders WHERE telegram_id = ? ORDER BY created_at DESC').all(req.telegramUser.id);
-  res.json(orders);
+app.get('/api/applications', auth, (req, res) => {
+  const rows = db.prepare('SELECT * FROM applications WHERE telegram_id = ? ORDER BY created_at DESC').all(req.telegramUser.id);
+  res.json(rows);
 });
 
 const PORT = process.env.PORT || 3000;

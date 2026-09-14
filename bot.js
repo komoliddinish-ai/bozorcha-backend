@@ -12,17 +12,17 @@ function startBot(botToken, webAppUrl) {
   const bot = new TelegramBot(botToken, { polling: true });
 
   bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(msg.chat.id, "Bozorchaga xush kelibsiz! Xarid qilish uchun tugmani bosing 👇", {
+    bot.sendMessage(msg.chat.id, "Fursat'ga xush kelibsiz! Telefonlarni bo'lib to'lab sotib olish uchun tugmani bosing 👇", {
       reply_markup: {
         inline_keyboard: [[
-          { text: '🛍 Do\'konni ochish', web_app: { url: webAppUrl } }
+          { text: '📱 Katalogni ochish', web_app: { url: webAppUrl } }
         ]]
       }
     });
   });
 
   bot.setChatMenuButton({
-    menu_button: { type: 'web_app', text: 'Do\'kon', web_app: { url: webAppUrl } }
+    menu_button: { type: 'web_app', text: 'Katalog', web_app: { url: webAppUrl } }
   }).catch((e) => console.log('Menu tugmasini o\'rnatishda xato:', e.message));
 
   console.log('Telegram bot ishga tushdi (polling rejimida).');

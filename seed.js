@@ -1,9 +1,11 @@
-// seed.js — namunaviy kategoriya va mahsulotlarni bazaga qo'shadi
-// Ishga tushirish: npm run seed
+// seed.js — namunaviy telefon brendlari va modellarini bazaga qo'shadi
+// DIQQAT: bu NAMUNA ma'lumotlar. 1C bazasiga ulanganimizda, bu o'rniga
+// haqiqiy mahsulotlar avtomatik olib kelinadi.
+// Ishga tushirish: npm run seed (yoki server ishga tushganda avtomatik)
 
 const db = require('./db');
 
-const categories = ['Elektronika', "Kiyim-kechak", 'Uy jihozlari'];
+const categories = ['iPhone', 'Samsung', 'Xiaomi'];
 const catIds = {};
 
 const insertCat = db.prepare('INSERT INTO categories (name) VALUES (?)');
@@ -13,12 +15,12 @@ for (const name of categories) {
 }
 
 const products = [
-  { cat: 'Elektronika', name: 'Simsiz quloqchin', description: 'Bluetooth 5.3, 30 soat batareya', price: 250000, image_url: 'https://picsum.photos/seed/headphones/400/400' },
-  { cat: 'Elektronika', name: 'Quvvat banki 20000mAh', description: 'Tez zaryadlash, 2 ta USB port', price: 180000, image_url: 'https://picsum.photos/seed/powerbank/400/400' },
-  { cat: 'Kiyim-kechak', name: 'Erkaklar futbolkasi', description: '100% paxta, S/M/L/XL', price: 90000, image_url: 'https://picsum.photos/seed/tshirt/400/400' },
-  { cat: 'Kiyim-kechak', name: 'Ayollar sport krossovkasi', description: 'Yengil, nafas oluvchi mato', price: 320000, image_url: 'https://picsum.photos/seed/sneakers/400/400' },
-  { cat: 'Uy jihozlari', name: 'Choy to\'plami (6 dona)', description: 'Keramika, sovg\'a qutisida', price: 150000, image_url: 'https://picsum.photos/seed/teaset/400/400' },
-  { cat: 'Uy jihozlari', name: 'Aromatik shamlar (3 dona)', description: 'Lavanda, vanil, sandal hidlari', price: 75000, image_url: 'https://picsum.photos/seed/candles/400/400' },
+  { cat: 'iPhone', name: 'iPhone 13 128GB', description: 'Qora, Neverlock', price: 7200000, image_url: 'https://picsum.photos/seed/iphone13/400/400' },
+  { cat: 'iPhone', name: 'iPhone 15 128GB', description: 'Ko\'k, Neverlock', price: 12500000, image_url: 'https://picsum.photos/seed/iphone15/400/400' },
+  { cat: 'Samsung', name: 'Samsung Galaxy A54', description: '8/256GB, Qora', price: 4200000, image_url: 'https://picsum.photos/seed/galaxya54/400/400' },
+  { cat: 'Samsung', name: 'Samsung Galaxy S23', description: '8/256GB, Kulrang', price: 9800000, image_url: 'https://picsum.photos/seed/galaxys23/400/400' },
+  { cat: 'Xiaomi', name: 'Redmi Note 13 Pro', description: '8/256GB, Ko\'k', price: 3100000, image_url: 'https://picsum.photos/seed/redmi13/400/400' },
+  { cat: 'Xiaomi', name: 'Xiaomi 13T', description: '12/256GB, Qora', price: 5900000, image_url: 'https://picsum.photos/seed/xiaomi13t/400/400' },
 ];
 
 const insertProd = db.prepare(`
@@ -37,7 +39,7 @@ if (existingCount === 0) {
       image_url: p.image_url,
     });
   }
-  console.log(`${products.length} ta mahsulot qo'shildi.`);
+  console.log(`${products.length} ta telefon qo'shildi.`);
 } else {
   console.log('Mahsulotlar allaqachon mavjud, seed o\'tkazib yuborildi.');
 }
