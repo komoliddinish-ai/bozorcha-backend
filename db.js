@@ -27,6 +27,7 @@ db.exec(`
     category_id   INTEGER REFERENCES categories(id),
     name          TEXT NOT NULL,
     description   TEXT,
+    condition     TEXT NOT NULL DEFAULT 'new',  -- 'new' (yangi) yoki 'used' (ishlatilgan)
     price         INTEGER NOT NULL,      -- tiyin/so'mda butun son sifatida
     image_url     TEXT,
     stock         INTEGER DEFAULT 100,

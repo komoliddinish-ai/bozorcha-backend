@@ -27,11 +27,39 @@
   }
   h1, h2, h3, .price { font-family: 'Fraunces', serif; }
 
-  header {
-    padding: 20px 16px 12px;
-  }
+  header { padding: 20px 16px 12px; }
   header h1 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; }
   header .tag { color: var(--hint); font-size: 13px; margin-top: 2px; }
+  .screen-title { padding: 18px 16px 4px; font-size: 20px; font-weight: 600; }
+
+  /* Bosh menyu */
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 16px 16px; }
+  .menu-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 14px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .menu-card .icon { font-size: 30px; margin-bottom: 10px; }
+  .menu-card .label { font-size: 14px; font-weight: 500; }
+
+  /* Tanlov ro'yxati (holat / brend) */
+  .choice-list { padding: 8px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .choice-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .choice-card .arrow { color: var(--hint); }
 
   .chips {
     display: flex;
@@ -53,12 +81,7 @@
   }
   .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 16px;
-  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
   .product {
     background: var(--card);
     border-radius: 4px;
@@ -71,34 +94,16 @@
   .product .name { font-size: 14px; font-weight: 500; line-height: 1.3; margin: 0 0 6px; min-height: 36px; }
   .product .price { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
   .product .from {
-    font-size: 12px;
-    color: var(--accent);
-    background: rgba(31,110,92,0.1);
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 4px;
+    font-size: 12px; color: var(--accent); background: rgba(31,110,92,0.1);
+    display: inline-block; padding: 3px 8px; border-radius: 4px;
   }
 
   .empty { text-align: center; color: var(--hint); padding: 60px 20px; font-size: 14px; }
 
   /* Mahsulot detail (pastki panel) */
-  .sheet {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    align-items: flex-end;
-    z-index: 50;
-  }
+  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: flex-end; z-index: 50; }
   .sheet.open { display: flex; }
-  .sheet-panel {
-    background: var(--bg);
-    width: 100%;
-    max-height: 88vh;
-    border-radius: 16px 16px 0 0;
-    padding: 18px 16px 28px;
-    overflow-y: auto;
-  }
+  .sheet-panel { background: var(--bg); width: 100%; max-height: 88vh; border-radius: 16px 16px 0 0; padding: 18px 16px 28px; overflow-y: auto; }
   .sheet-panel img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 14px; }
   .sheet-panel h2 { margin: 0 0 4px; font-size: 20px; }
   .sheet-panel .desc { color: var(--hint); font-size: 13px; margin: 0 0 10px; }
@@ -106,57 +111,47 @@
   .sheet-panel .cash-price b { font-family: 'Fraunces', serif; font-size: 19px; }
 
   .terms-label { font-size: 13px; color: var(--hint); margin-bottom: 8px; }
-  .terms {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 16px;
-  }
+  .terms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
   .term-btn {
-    padding: 10px 4px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13px;
-    text-align: center;
-    cursor: pointer;
+    padding: 10px 4px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); font-size: 13px; text-align: center; cursor: pointer;
   }
   .term-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-  .plan-summary {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 16px;
-  }
+  .plan-summary { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
   .plan-summary .monthly { font-size: 22px; font-weight: 600; font-family: 'Fraunces', serif; }
   .plan-summary .sub { font-size: 12px; color: var(--hint); margin-top: 4px; }
 
   .apply-form { display: none; flex-direction: column; gap: 10px; margin-top: 4px; }
   .apply-form.open { display: flex; }
   .apply-form input {
-    padding: 12px 13px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    color: var(--text);
-    font-size: 15px;
-    font-family: inherit;
+    padding: 12px 13px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); font-size: 15px; font-family: inherit;
   }
+
+  /* To'lovlarim */
+  .payment-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 0 16px 10px; }
+  .payment-card .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .payment-card .pname { font-weight: 500; font-size: 14px; }
+  .payment-card .pstatus { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(31,110,92,0.12); color: var(--accent); }
+  .payment-card .prow { font-size: 13px; color: var(--hint); }
+
+  /* Call markaz / Filiallar */
+  .info-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 0 16px 10px; }
+  .info-card .iname { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+  .info-card .iaddr { font-size: 13px; color: var(--hint); margin-bottom: 8px; }
+  .info-card a.iphone { color: var(--accent); font-size: 14px; text-decoration: none; font-weight: 500; }
 </style>
 </head>
 <body>
 
-<header>
+<header id="topHeader">
   <h1>Fursat</h1>
   <div class="tag">telefonlarni bo'lib to'lab sotib oling</div>
 </header>
 
-<div class="chips" id="chips"></div>
-<div class="grid" id="grid"></div>
-<div class="empty" id="empty" style="display:none">Bu bo'limda mahsulot yo'q</div>
+<div id="screenTitle"></div>
+<div id="app"></div>
 
 <div class="sheet" id="sheet">
   <div class="sheet-panel" id="sheetPanel"></div>
@@ -167,13 +162,19 @@ const tg = window.Telegram?.WebApp;
 tg?.ready();
 tg?.expand();
 
-// Backend manzili
 const API_BASE = 'https://bozorcha-backend-production.up.railway.app';
 
-let products = [];
+// ---------- Holat (navigatsiya) ----------
+let stack = ['home'];              // ekranlar tarixi (orqaga qaytish uchun)
+let selectedCondition = null;      // 'new' | 'used'
+let selectedCategory = null;       // brend id
 let categories = [];
 let terms = [];
-let activeCategory = null;
+let products = [];
+let applications = [];
+let callCenter = [];
+let branches = [];
+
 let currentProduct = null;
 let selectedTerm = null;
 let applyMode = false;
@@ -181,12 +182,7 @@ let applyMode = false;
 function authHeaders() {
   return tg?.initData ? { 'Authorization': 'tma ' + tg.initData } : {};
 }
-
-function money(v) {
-  return v.toLocaleString('uz-UZ') + " so'm";
-}
-
-// Oylik to'lovni hisoblash (backenddagi config.js bilan bir xil formula)
+function money(v) { return v.toLocaleString('uz-UZ') + " so'm"; }
 function calcPlan(basePrice, months) {
   const term = terms.find(t => t.months === months);
   if (!term) return null;
@@ -195,58 +191,185 @@ function calcPlan(basePrice, months) {
   return { months, total, monthly };
 }
 
+function go(screen) {
+  stack.push(screen);
+  render();
+}
+function goBack() {
+  if (stack.length > 1) stack.pop();
+  render();
+}
+tg?.BackButton.onClick(goBack);
+
+// ---------- Ekranlarni chizish ----------
+
+function render() {
+  const screen = stack[stack.length - 1];
+  document.getElementById('topHeader').style.display = screen === 'home' ? 'block' : 'none';
+  if (tg) { screen === 'home' ? tg.BackButton.hide() : tg.BackButton.show(); }
+
+  const titleEl = document.getElementById('screenTitle');
+  const titles = {
+    condition: 'Sotuvdagi telefonlar', brand: 'Brendni tanlang', models: 'Modelni tanlang',
+    payments: "To'lovlarim", callcenter: 'Call markaz', branches: 'Mavjud filiallar',
+  };
+  titleEl.innerHTML = titles[screen] ? `<div class="screen-title">${titles[screen]}</div>` : '';
+
+  const app = document.getElementById('app');
+  if (screen === 'home') app.innerHTML = homeHTML();
+  else if (screen === 'condition') app.innerHTML = conditionHTML();
+  else if (screen === 'brand') app.innerHTML = brandHTML();
+  else if (screen === 'models') app.innerHTML = modelsHTML();
+  else if (screen === 'payments') renderPayments();
+  else if (screen === 'callcenter') renderCallCenter();
+  else if (screen === 'branches') renderBranches();
+
+  attachHandlers(screen);
+}
+
+function homeHTML() {
+  return `
+    <div class="menu-grid">
+      <div class="menu-card" data-go="condition"><div class="icon">📱</div><div class="label">Sotuvdagi<br>telefonlar</div></div>
+      <div class="menu-card" data-go="payments"><div class="icon">💳</div><div class="label">To'lovlarim</div></div>
+      <div class="menu-card" data-go="callcenter"><div class="icon">☎️</div><div class="label">Call markaz</div></div>
+      <div class="menu-card" data-go="branches"><div class="icon">🏢</div><div class="label">Mavjud<br>filiallar</div></div>
+    </div>
+  `;
+}
+
+function conditionHTML() {
+  return `
+    <div class="choice-list">
+      <div class="choice-card" data-condition="new">Yangi telefonlar <span class="arrow">›</span></div>
+      <div class="choice-card" data-condition="used">Ishlatilgan (B/U) yaxshi holatdagi telefonlar <span class="arrow">›</span></div>
+    </div>
+  `;
+}
+
+function brandHTML() {
+  if (categories.length === 0) return `<div class="empty">Yuklanmoqda...</div>`;
+  return `
+    <div class="choice-list">
+      ${categories.map(c => `<div class="choice-card" data-brand="${c.id}">${c.name} <span class="arrow">›</span></div>`).join('')}
+    </div>
+  `;
+}
+
+function modelsHTML() {
+  if (products.length === 0) return `<div class="empty">Bu bo'limda mahsulot yo'q</div>`;
+  const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
+  return `
+    <div class="grid">
+      ${products.map(p => {
+        const fromPlan = longestTerm ? calcPlan(p.price, longestTerm) : null;
+        return `
+        <div class="product" data-product="${p.id}">
+          <img src="${p.image_url}" alt="${p.name}" loading="lazy">
+          <div class="info">
+            <p class="name">${p.name}</p>
+            <p class="price">${money(p.price)}</p>
+            ${fromPlan ? `<span class="from">${fromPlan.months} oyga: ${money(fromPlan.monthly)}/oy dan</span>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+async function renderPayments() {
+  const app = document.getElementById('app');
+  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
+  if (applications.length === 0) {
+    const res = await fetch(`${API_BASE}/api/applications`, { headers: authHeaders() });
+    applications = res.ok ? await res.json() : [];
+  }
+  if (applications.length === 0) {
+    app.innerHTML = `<div class="empty">Hali arizangiz yo'q</div>`;
+    return;
+  }
+  const statusLabels = { new: 'Yangi', contacted: 'Bog\'lanildi', approved: 'Tasdiqlandi', rejected: 'Rad etildi' };
+  app.innerHTML = applications.map(a => `
+    <div class="payment-card">
+      <div class="top">
+        <span class="pname">${a.product_name}</span>
+        <span class="pstatus">${statusLabels[a.status] || a.status}</span>
+      </div>
+      <div class="prow">${a.term_months} oyga · ${money(a.monthly_payment)}/oy · jami ${money(a.total_price)}</div>
+    </div>
+  `).join('');
+}
+
+async function renderCallCenter() {
+  const app = document.getElementById('app');
+  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
+  if (callCenter.length === 0) {
+    const res = await fetch(`${API_BASE}/api/call-center`);
+    callCenter = await res.json();
+  }
+  app.innerHTML = callCenter.map(c => `
+    <div class="info-card">
+      <div class="iname">${c.label}</div>
+      <a class="iphone" href="tel:${c.phone}">${c.phone}</a>
+    </div>
+  `).join('');
+}
+
+async function renderBranches() {
+  const app = document.getElementById('app');
+  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
+  if (branches.length === 0) {
+    const res = await fetch(`${API_BASE}/api/branches`);
+    branches = await res.json();
+  }
+  app.innerHTML = branches.map(b => `
+    <div class="info-card">
+      <div class="iname">${b.name}</div>
+      <div class="iaddr">${b.address}</div>
+      <a class="iphone" href="tel:${b.phone}">${b.phone}</a>
+    </div>
+  `).join('');
+}
+
+function attachHandlers(screen) {
+  document.querySelectorAll('[data-go]').forEach(el => {
+    el.onclick = () => go(el.dataset.go);
+  });
+  document.querySelectorAll('[data-condition]').forEach(el => {
+    el.onclick = () => {
+      selectedCondition = el.dataset.condition;
+      go('brand');
+    };
+  });
+  document.querySelectorAll('[data-brand]').forEach(el => {
+    el.onclick = async () => {
+      selectedCategory = el.dataset.brand;
+      await loadProducts();
+      go('models');
+    };
+  });
+  document.querySelectorAll('[data-product]').forEach(el => {
+    el.onclick = () => openProduct(Number(el.dataset.product));
+  });
+}
+
+// ---------- Ma'lumot yuklash ----------
+
 async function loadTerms() {
   const res = await fetch(`${API_BASE}/api/installment-terms`);
   terms = await res.json();
 }
-
 async function loadCategories() {
   const res = await fetch(`${API_BASE}/api/categories`);
   categories = await res.json();
-  const chips = document.getElementById('chips');
-  chips.innerHTML = '<button class="chip active" data-id="">Barchasi</button>' +
-    categories.map(c => `<button class="chip" data-id="${c.id}">${c.name}</button>`).join('');
-  chips.querySelectorAll('.chip').forEach(btn => {
-    btn.onclick = () => {
-      chips.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.dataset.id || null;
-      loadProducts();
-    };
-  });
 }
-
 async function loadProducts() {
-  const url = activeCategory ? `${API_BASE}/api/products?category_id=${activeCategory}` : `${API_BASE}/api/products`;
+  const url = `${API_BASE}/api/products?category_id=${selectedCategory}&condition=${selectedCondition}`;
   const res = await fetch(url);
   products = await res.json();
-  renderProducts();
 }
 
-function renderProducts() {
-  const grid = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  if (products.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
-  grid.innerHTML = products.map(p => {
-    const fromPlan = longestTerm ? calcPlan(p.price, longestTerm) : null;
-    return `
-    <div class="product" onclick="openProduct(${p.id})">
-      <img src="${p.image_url}" alt="${p.name}" loading="lazy">
-      <div class="info">
-        <p class="name">${p.name}</p>
-        <p class="price">${money(p.price)}</p>
-        ${fromPlan ? `<span class="from">${fromPlan.months} oyga: ${money(fromPlan.monthly)}/oy dan</span>` : ''}
-      </div>
-    </div>
-  `;
-  }).join('');
-}
+// ---------- Mahsulot detail (pastki panel) ----------
 
 function openProduct(id) {
   currentProduct = products.find(p => p.id === id);
@@ -298,13 +421,10 @@ function renderSheet() {
 
 function updateMainButton() {
   if (!tg) return;
-  if (!selectedTerm) { tg.MainButton.hide(); return; }
+  const sheetOpen = document.getElementById('sheet').classList.contains('open');
+  if (!sheetOpen || !selectedTerm) { tg.MainButton.hide(); return; }
   const plan = calcPlan(currentProduct.price, selectedTerm);
-  if (!applyMode) {
-    tg.MainButton.setText(`Ariza qoldirish · ${money(plan.monthly)}/oy`);
-  } else {
-    tg.MainButton.setText('Arizani yuborish');
-  }
+  tg.MainButton.setText(!applyMode ? `Ariza qoldirish · ${money(plan.monthly)}/oy` : 'Arizani yuborish');
   tg.MainButton.show();
 }
 
@@ -338,6 +458,7 @@ tg?.MainButton.onClick(async () => {
 
   if (res.ok) {
     tg.HapticFeedback?.notificationOccurred('success');
+    applications = []; // keyingi safar "To'lovlarim" qayta yuklansin
     tg.showAlert("Arizangiz qabul qilindi! Tez orada operatorimiz siz bilan bog'lanadi.", () => {
       document.getElementById('sheet').classList.remove('open');
       tg.MainButton.hide();
@@ -354,10 +475,11 @@ document.getElementById('sheet').onclick = (e) => {
   }
 };
 
+// ---------- Ishga tushirish ----------
+
 async function init() {
-  await loadTerms();
-  await loadCategories();
-  await loadProducts();
+  await Promise.all([loadTerms(), loadCategories()]);
+  render();
 }
 init();
 </script>

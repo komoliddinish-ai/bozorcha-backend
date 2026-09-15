@@ -4,7 +4,7 @@ const cors = require('cors');
 const db = require('./db');
 require('./seed'); // baza bo'sh bo'lsa, namunaviy telefonlarni avtomatik qo'shadi
 const { requireTelegramAuth } = require('./auth');
-const { TERM_OPTIONS, calcInstallment } = require('./config');
+const { TERM_OPTIONS, calcInstallment, CALL_CENTER, BRANCHES } = require('./config');
 
 const app = express();
 app.use(cors());
@@ -28,13 +28,12 @@ app.get('/api/categories', (req, res) => {
 });
 
 app.get('/api/products', (req, res) => {
-  const { category_id } = req.query;
-  let rows;
-  if (category_id) {
-    rows = db.prepare('SELECT * FROM products WHERE is_active = 1 AND category_id = ?').all(category_id);
-  } else {
-    rows = db.prepare('SELECT * FROM products WHERE is_active = 1').all();
-  }
+  const { category_id, condition } = req.query;
+  const clauses = ['is_active = 1'];
+  const params = [];
+  if (category_id) { clauses.push('category_id = ?'); params.push(category_id); }
+  if (condition) { clauses.push('condition = ?'); params.push(condition); }
+  const rows = db.prepare(`SELECT * FROM products WHERE ${clauses.join(' AND ')}`).all(...params);
   res.json(rows);
 });
 
@@ -49,6 +48,16 @@ app.get('/api/products/:id', (req, res) => {
 
 app.get('/api/installment-terms', (req, res) => {
   res.json(TERM_OPTIONS);
+});
+
+// ---------- Call markaz va filiallar ----------
+
+app.get('/api/call-center', (req, res) => {
+  res.json(CALL_CENTER);
+});
+
+app.get('/api/branches', (req, res) => {
+  res.json(BRANCHES);
 });
 
 // ---------- Arizalar ----------

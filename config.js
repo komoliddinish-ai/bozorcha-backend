@@ -21,4 +21,18 @@ function calcInstallment(basePrice, months) {
   return { months: term.months, markup: term.markup, total_price: total, monthly_payment: monthly };
 }
 
-module.exports = { TERM_OPTIONS, calcInstallment };
+// ---------- Call markaz va filiallar ----------
+// DIQQAT: bular ham NAMUNA. Haqiqiy raqam/manzillaringizni ayting — shu
+// yerga to'g'rilab qo'yaman.
+
+const CALL_CENTER = [
+  { label: 'Call markaz', phone: '+998712000000' },
+  { label: "Qo'llab-quvvatlash", phone: '+998712000001' },
+];
+
+const BRANCHES = [
+  { name: 'Chilonzor filiali', address: "Toshkent, Chilonzor tumani, Bunyodkor ko'chasi 12", phone: '+998712000010' },
+  { name: 'Yunusobod filiali', address: 'Toshkent, Yunusobod tumani, Amir Temur shoh ko\'chasi 45', phone: '+998712000020' },
+];
+
+module.exports = { TERM_OPTIONS, calcInstallment, CALL_CENTER, BRANCHES };
