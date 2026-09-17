@@ -78,11 +78,11 @@ app.post('/api/applications', auth, (req, res) => {
 
   const result = db.prepare(`
     INSERT INTO applications
-      (telegram_id, customer_name, customer_phone, product_id, product_name, base_price, term_months, monthly_payment, total_price)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (telegram_id, customer_name, customer_phone, product_id, product_name, base_price, down_payment, term_months, monthly_payment, total_price)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     req.telegramUser.id, customer_name, customer_phone,
-    product.id, product.name, product.price,
+    product.id, product.name, product.price, plan.down_payment,
     plan.months, plan.monthly_payment, plan.total_price
   );
 

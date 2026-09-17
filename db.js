@@ -43,6 +43,7 @@ db.exec(`
     product_id        INTEGER NOT NULL,
     product_name      TEXT NOT NULL,        -- ariza vaqtidagi nom (tarix uchun)
     base_price        INTEGER NOT NULL,     -- naqd narxi
+    down_payment      INTEGER NOT NULL,     -- boshlang'ich to'lov (kamida 30%)
     term_months       INTEGER NOT NULL,
     monthly_payment   INTEGER NOT NULL,
     total_price       INTEGER NOT NULL,

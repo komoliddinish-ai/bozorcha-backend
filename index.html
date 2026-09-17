@@ -190,12 +190,17 @@ function authHeaders() {
   return tg?.initData ? { 'Authorization': 'tma ' + tg.initData } : {};
 }
 function money(v) { return v.toLocaleString('uz-UZ') + " so'm"; }
+const MIN_DOWN_PAYMENT_RATE = 0.30; // boshlang'ich to'lov kamida naqd narxining 30%i
+
 function calcPlan(basePrice, months) {
   const term = terms.find(t => t.months === months);
   if (!term) return null;
-  const total = Math.round(basePrice * (1 + term.markup));
-  const monthly = Math.round(total / term.months);
-  return { months, total, monthly };
+  const downPayment = Math.round(basePrice * MIN_DOWN_PAYMENT_RATE);
+  const remaining = basePrice - downPayment;
+  const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
+  const total = remainingWithMarkup + downPayment;
+  const monthly = Math.round(remainingWithMarkup / months);
+  return { months, total, monthly, downPayment };
 }
 
 function go(screen) {
@@ -443,6 +448,7 @@ function renderSheet() {
     <h2>${p.name}</h2>
     <p class="desc">${p.description || ''}</p>
     <p class="cash-price">Naqd narxi: <b>${money(p.price)}</b></p>
+    <p class="cash-price" style="margin-top:-12px;font-size:13px;color:var(--hint);">Boshlang'ich to'lov (kamida 30%): <b style="font-size:14px;">${money(Math.round(p.price * MIN_DOWN_PAYMENT_RATE))}</b></p>
 
     <p class="terms-label">Muddatni tanlang:</p>
     <div class="terms" id="termsRow">
@@ -452,7 +458,7 @@ function renderSheet() {
     ${plan ? `
       <div class="plan-summary">
         <div class="monthly">${money(plan.monthly)}<span style="font-size:13px;font-weight:400;color:var(--hint)"> / oy</span></div>
-        <div class="sub">${plan.months} oyga jami: ${money(plan.total)}</div>
+        <div class="sub">${plan.months} oyga jami: ${money(plan.total)} (boshlang'ich to'lov bilan)</div>
       </div>
     ` : ''}
 
