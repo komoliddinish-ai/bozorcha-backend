@@ -218,6 +218,7 @@ function render() {
   const titleEl = document.getElementById('screenTitle');
   const titles = {
     condition: 'Sotuvdagi telefonlar', brand: 'Brendni tanlang', models: 'Modelni tanlang',
+    variants: 'Variantni tanlang',
     payments: "To'lovlarim", callcenter: 'Call markaz', branches: 'Mavjud filiallar',
   };
   titleEl.innerHTML = titles[screen] ? `<div class="screen-title">${titles[screen]}</div>` : '';
@@ -227,6 +228,7 @@ function render() {
   else if (screen === 'condition') app.innerHTML = conditionHTML();
   else if (screen === 'brand') app.innerHTML = brandHTML();
   else if (screen === 'models') app.innerHTML = modelsHTML();
+  else if (screen === 'variants') app.innerHTML = variantsHTML();
   else if (screen === 'payments') renderPayments();
   else if (screen === 'callcenter') renderCallCenter();
   else if (screen === 'branches') renderBranches();
@@ -265,10 +267,44 @@ function brandHTML() {
 
 function modelsHTML() {
   if (products.length === 0) return `<div class="empty">Bu bo'limda mahsulot yo'q</div>`;
+  const groups = groupByModel(products);
+  const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
+  return `
+    <div class="choice-list">
+      ${groups.map(g => {
+        const cheapest = g.items.reduce((min, p) => p.price < min.price ? p : min, g.items[0]);
+        const fromPlan = longestTerm ? calcPlan(cheapest.price, longestTerm) : null;
+        return `
+        <div class="choice-card" data-group="${g.name}">
+          <div>
+            <div>${g.name}</div>
+            <div style="font-size:12px;font-weight:400;color:var(--hint);margin-top:3px;">
+              ${g.items.length > 1 ? `${g.items.length} ta variant · ` : ''}${money(cheapest.price)}${fromPlan ? ` dan` : ''}
+            </div>
+          </div>
+          <span class="arrow">›</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function groupByModel(list) {
+  const map = new Map();
+  for (const p of list) {
+    if (!map.has(p.model_group)) map.set(p.model_group, []);
+    map.get(p.model_group).push(p);
+  }
+  return [...map.entries()].map(([name, items]) => ({ name, items }));
+}
+
+let currentVariants = [];
+
+function variantsHTML() {
   const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
   return `
     <div class="grid">
-      ${products.map(p => {
+      ${currentVariants.map(p => {
         const fromPlan = longestTerm ? calcPlan(p.price, longestTerm) : null;
         return `
         <div class="product" data-product="${p.id}">
@@ -353,6 +389,17 @@ function attachHandlers(screen) {
       selectedCategory = el.dataset.brand;
       await loadProducts();
       go('models');
+    };
+  });
+  document.querySelectorAll('[data-group]').forEach(el => {
+    el.onclick = () => {
+      const group = groupByModel(products).find(g => g.name === el.dataset.group);
+      if (group.items.length === 1) {
+        openProduct(group.items[0].id);
+      } else {
+        currentVariants = group.items;
+        go('variants');
+      }
     };
   });
   document.querySelectorAll('[data-product]').forEach(el => {

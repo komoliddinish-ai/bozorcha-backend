@@ -25,7 +25,8 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS products (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id   INTEGER REFERENCES categories(id),
-    name          TEXT NOT NULL,
+    model_group   TEXT NOT NULL,        -- model nomi (masalan "iPhone 17 Pro Max") — variantlarni guruhlaydi
+    name          TEXT NOT NULL,        -- to'liq nom, variant bilan (masalan "iPhone 17 Pro Max 256GB Qora")
     description   TEXT,
     condition     TEXT NOT NULL DEFAULT 'new',  -- 'new' (yangi) yoki 'used' (ishlatilgan)
     price         INTEGER NOT NULL,      -- tiyin/so'mda butun son sifatida
