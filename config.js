@@ -45,14 +45,17 @@ function calcInstallment(basePrice, months, downPayment) {
 }
 
 // ---------- Call markaz va filiallar ----------
-// DIQQAT: bular NAMUNA ma'lumotlar — haqiqiy raqamlar/manzillarni bersangiz almashtiraman.
 
 const CALL_CENTER = [
-  { label: 'Call markaz', phone: '+998 71 200 00 00' },
+  { label: 'Asosiy raqam', phone: '+998 97 107 44 44' },
+  { label: "Texnik bo'lim", phone: '+998 98 177 15 53' },
+  { label: "To'lov bo'limi", phone: '+998 97 103 44 40' },
 ];
 
 const BRANCHES = [
-  { name: 'Fursat — Bosh filial', address: "Toshkent sh., Chilonzor tumani", phone: '+998 71 200 00 01' },
+  { name: 'Parkent filiali', address: 'Parkent, 74', phone: '+998 97 107 44 44' },
+  { name: "Bog'iravon filiali", address: "Bog'iravon, 33", phone: '+998 97 107 44 44' },
+  { name: 'Chorsu filiali', address: 'Chorsu', phone: '+998 97 107 44 44' },
 ];
 
 module.exports = { TERM_OPTIONS, MIN_DOWN_PAYMENT_RATE, minDownPayment, calcInstallment, CALL_CENTER, BRANCHES };

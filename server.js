@@ -90,7 +90,7 @@ app.post('/api/applications', auth, (req, res) => {
 });
 
 app.get('/api/applications', auth, (req, res) => {
-  const rows = db.prepare('SELECT * FROM applications WHERE telegram_id = ? ORDER BY created_at DESC').all(req.telegramUser.id);
+  const rows = db.prepare('SELECT * FROM applications WHERE telegram_id = ? OR is_demo = 1 ORDER BY created_at DESC').all(req.telegramUser.id);
   res.json(rows);
 });
 

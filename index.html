@@ -337,15 +337,22 @@ async function renderPayments() {
     return;
   }
   const statusLabels = { new: 'Yangi', contacted: 'Bog\'lanildi', approved: 'Tasdiqlandi', rejected: 'Rad etildi' };
-  app.innerHTML = applications.map(a => `
+  app.innerHTML = applications.map(a => {
+    const pct = a.term_months > 0 ? Math.round((a.paid_installments / a.term_months) * 100) : 0;
+    return `
     <div class="payment-card">
       <div class="top">
-        <span class="pname">${a.product_name}</span>
+        <span class="pname">${a.product_name}${a.is_demo ? ' <span style="font-weight:400;color:var(--hint);font-size:11px;">(namuna)</span>' : ''}</span>
         <span class="pstatus">${statusLabels[a.status] || a.status}</span>
       </div>
       <div class="prow">${a.term_months} oyga · ${money(a.monthly_payment)}/oy · jami ${money(a.total_price)}</div>
+      <div style="margin-top:8px;background:var(--line);border-radius:6px;height:6px;overflow:hidden;">
+        <div style="width:${pct}%;background:var(--accent);height:100%;"></div>
+      </div>
+      <div class="prow" style="margin-top:4px;">${a.paid_installments}/${a.term_months} oy to'langan (${pct}%)</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 async function renderCallCenter() {

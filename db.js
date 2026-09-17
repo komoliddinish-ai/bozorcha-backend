@@ -47,6 +47,8 @@ db.exec(`
     term_months       INTEGER NOT NULL,
     monthly_payment   INTEGER NOT NULL,
     total_price       INTEGER NOT NULL,
+    paid_installments INTEGER DEFAULT 0,    -- nechta oylik to'lov qilingan (hozircha qo'lda kiritiladi)
+    is_demo           INTEGER DEFAULT 0,    -- 1 = namuna yozuv (hamma foydalanuvchiga ko'rinadi)
     status            TEXT DEFAULT 'new',   -- new -> contacted -> approved -> rejected
     created_at        TEXT DEFAULT CURRENT_TIMESTAMP
   );
