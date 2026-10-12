@@ -2,551 +2,1150 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Fursat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Fursat — bo'lib to'lash</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Ranglar Telegram mavzusidan olinadi (yorug'/qorong'i rejim avtomatik) */
   :root {
-    --bg: var(--tg-theme-bg-color, #FBF7F1);
-    --text: var(--tg-theme-text-color, #241C15);
-    --hint: var(--tg-theme-hint-color, #8A7E70);
-    --accent: #1F6E5C;
-    --accent-dark: #16503F;
-    --card: var(--tg-theme-secondary-bg-color, #FFFFFF);
-    --line: #E7DDCF;
+    --bg: var(--tg-theme-secondary-bg-color, #F2F3F5);
+    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #FFFFFF));
+    --text: var(--tg-theme-text-color, #0F1412);
+    --hint: var(--tg-theme-hint-color, #858B88);
+    --link: var(--tg-theme-link-color, #0E8A63);
+    --sep: rgba(128, 128, 128, 0.16);
+    --accent: #0E8A63;
+    --accent-2: #13B07F;
+    --accent-soft: rgba(14, 138, 99, 0.12);
+    --danger: #E5484D;
+    --danger-soft: rgba(229, 72, 77, 0.12);
+    --warn: #D9822B;
+    --warn-soft: rgba(217, 130, 43, 0.14);
+    --info: #3E7BFA;
+    --info-soft: rgba(62, 123, 250, 0.12);
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
-    padding-bottom: 40px;
+    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, .price { font-family: 'Fraunces', serif; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  svg.i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-  header {
-    margin: 16px 16px 12px;
-    padding: 24px 20px 22px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #1F6E5C 0%, #2E8B73 55%, #47B08F 100%);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(31,110,92,0.25);
-  }
-  header h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; color: #fff; }
-  header .tag { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 4px; }
-  .screen-title { padding: 18px 16px 4px; font-size: 20px; font-weight: 600; }
+  .page { padding: 12px 16px 0; }
+  .page.anim { animation: fade .18s ease-out; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 6px 4px 14px; }
+  .section-label { font-size: 13px; color: var(--hint); text-transform: uppercase; letter-spacing: .04em; margin: 22px 4px 8px; }
+  .muted { color: var(--hint); }
 
-  /* Bosh menyu */
-  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 16px 16px; }
-  .menu-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 20px 14px;
-    text-align: center;
-    cursor: pointer;
+  /* ---------- Bosh sahifa ---------- */
+  .hero {
+    position: relative; overflow: hidden;
+    border-radius: 22px; padding: 22px 20px 20px; color: #fff;
+    background: radial-gradient(120% 140% at 100% 0%, #26C08E 0%, #0E8A63 45%, #0A5E45 100%);
+    box-shadow: 0 10px 30px rgba(14, 138, 99, .28);
   }
-  .menu-card .icon { font-size: 30px; margin-bottom: 10px; }
-  .menu-card .label { font-size: 14px; font-weight: 500; }
+  .hero::after {
+    content: ""; position: absolute; right: -40px; bottom: -60px; width: 200px; height: 200px;
+    border-radius: 50%; border: 28px solid rgba(255,255,255,.07);
+  }
+  .hero .hello { font-size: 14px; opacity: .85; }
+  .hero h1 { margin: 4px 0 6px; font-size: 30px; letter-spacing: -0.03em; line-height: 1.05; }
+  .hero p { margin: 0 0 18px; font-size: 15px; opacity: .92; max-width: 260px; }
+  .hero .facts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .hero .fact { background: rgba(255,255,255,.16); border-radius: 999px; padding: 5px 11px; font-size: 13px; font-weight: 500; }
+  .hero .cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff; color: #0A5E45; font-weight: 600; padding: 11px 18px; border-radius: 12px;
+  }
 
-  /* Tanlov ro'yxati (holat / brend) */
-  .choice-list { padding: 8px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .choice-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 16px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .choice-card .arrow { color: var(--hint); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .step { background: var(--card); border-radius: 14px; padding: 12px 10px; box-shadow: var(--shadow); }
+  .step b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 13px; margin-bottom: 8px; }
+  .step span { font-size: 13px; line-height: 1.3; display: block; }
 
-  .chips {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 4px 16px 16px;
-    scrollbar-width: none;
-  }
+  /* iOS uslubidagi ro'yxat */
+  .list { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; width: 100%; text-align: left; position: relative; }
+  .row + .row::before { content: ""; position: absolute; top: 0; left: 58px; right: 0; height: 1px; background: var(--sep); }
+  .row:active { background: var(--sep); }
+  .row .ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; color: #fff; flex: none; }
+  .row .ic svg { width: 18px; height: 18px; }
+  .row .grow { flex: 1; min-width: 0; }
+  .row .t { font-weight: 500; }
+  .row .s { font-size: 13px; color: var(--hint); margin-top: 1px; }
+  .row .chev { color: var(--hint); opacity: .6; }
+  .row .badge { background: var(--danger); color: #fff; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px; }
+
+  /* ---------- Katalog ---------- */
+  .segment { display: grid; grid-template-columns: 1fr 1fr; background: var(--sep); border-radius: 12px; padding: 3px; margin-bottom: 12px; }
+  .segment button { padding: 8px; border-radius: 9px; font-weight: 500; font-size: 14px; color: var(--hint); transition: background .15s; }
+  .segment button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+
+  .search { display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 12px; padding: 0 12px; margin-bottom: 12px; color: var(--hint); }
+  .search input { flex: 1; border: 0; outline: 0; background: none; padding: 11px 0; color: var(--text); font-size: 15px; }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 14px; padding: 0 16px; scrollbar-width: none; }
   .chips::-webkit-scrollbar { display: none; }
-  .chip {
-    flex: none;
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--line);
-    font-size: 14px;
-    color: var(--text);
-    background: transparent;
-    cursor: pointer;
+  .chip { flex: none; padding: 7px 14px; border-radius: 999px; background: var(--card); font-size: 14px; font-weight: 500; box-shadow: var(--shadow); }
+  .chip.on { background: var(--text); color: var(--card); }
+  .chip .n { opacity: .5; margin-left: 4px; font-weight: 400; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); text-align: left; display: flex; flex-direction: column; transition: transform .12s; }
+  .card:active { transform: scale(.97); }
+  .card .img { aspect-ratio: 1 / 0.92; background: #E8F0EC; position: relative; }
+  .card .img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .tag { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; backdrop-filter: blur(6px); }
+  .card .body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .card .name { font-weight: 600; font-size: 14px; line-height: 1.25; }
+  .card .meta { font-size: 12px; color: var(--hint); }
+  .card .price { font-weight: 700; font-size: 15px; margin-top: auto; padding-top: 6px; letter-spacing: -0.01em; }
+  .card .monthly { display: inline-block; align-self: flex-start; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 6px; }
+
+  .vlist { display: flex; flex-direction: column; gap: 10px; }
+  .vrow { display: flex; gap: 12px; align-items: center; background: var(--card); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); text-align: left; width: 100%; }
+  .vrow:active { transform: scale(.98); }
+  .vrow img { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; flex: none; }
+  .vrow .grow { flex: 1; min-width: 0; }
+  .vrow .name { font-weight: 600; }
+  .vrow .meta { font-size: 13px; color: var(--hint); margin: 2px 0 6px; }
+  .vrow .price { font-weight: 700; }
+  .vrow .monthly { font-size: 13px; color: var(--accent); font-weight: 600; }
+
+  /* ---------- Holatlar ---------- */
+  .empty { text-align: center; padding: 56px 24px; color: var(--hint); }
+  .empty .em { font-size: 44px; margin-bottom: 10px; }
+  .empty .et { color: var(--text); font-weight: 600; font-size: 17px; margin-bottom: 4px; }
+  .empty .btn { margin-top: 18px; }
+  .skel { background: linear-gradient(90deg, var(--sep) 0%, rgba(128,128,128,.08) 50%, var(--sep) 100%); background-size: 200% 100%; animation: sh 1.2s infinite; border-radius: var(--radius); }
+  @keyframes sh { to { background-position: -200% 0; } }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 18px; border-radius: 12px; font-weight: 600; background: var(--accent); color: #fff; }
+  .btn.block { width: 100%; }
+  .btn.ghost { background: var(--accent-soft); color: var(--accent); }
+  .btn.soft { background: var(--sep); color: var(--text); }
+  .btn.danger { background: var(--danger-soft); color: var(--danger); }
+  .btn.sm { padding: 8px 12px; font-size: 14px; border-radius: 10px; }
+  .btn:disabled { opacity: .5; }
+
+  /* ---------- Pastki panel (sheet) ---------- */
+  .sheet { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+  .sheet .shade { position: absolute; inset: 0; background: rgba(0,0,0,.42); opacity: 0; transition: opacity .22s; }
+  .sheet .panel {
+    position: absolute; left: 0; right: 0; bottom: 0; max-height: 92vh; overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg); border-radius: 22px 22px 0 0;
+    padding: 8px 16px calc(24px + env(safe-area-inset-bottom));
+    transform: translateY(100%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
   }
-  .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .sheet.open { pointer-events: auto; }
+  .sheet.open .shade { opacity: 1; }
+  .sheet.open .panel { transform: none; }
+  .grab { width: 38px; height: 5px; border-radius: 3px; background: var(--sep); margin: 0 auto 10px; }
+  .sheet-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .sheet-head .grow { flex: 1; }
+  .sheet-head h2 { margin: 0; font-size: 21px; letter-spacing: -0.02em; line-height: 1.2; }
+  .close { width: 30px; height: 30px; border-radius: 50%; background: var(--sep); display: grid; place-items: center; color: var(--hint); flex: none; }
+  .close svg { width: 16px; height: 16px; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
-  .product {
-    background: var(--card);
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    cursor: pointer;
-  }
-  .product img { width: 100%; height: 130px; object-fit: cover; display: block; }
-  .product .info { padding: 12px 10px 14px; }
-  .product .name { font-size: 14px; font-weight: 500; line-height: 1.3; margin: 0 0 6px; min-height: 36px; }
-  .product .price { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
-  .product .from {
-    font-size: 12px; color: var(--accent); background: rgba(31,110,92,0.1);
-    display: inline-block; padding: 3px 8px; border-radius: 4px;
-  }
+  .pimg { width: 100%; height: 220px; object-fit: contain; background: linear-gradient(135deg, #EEF4F1, #DCE8E2); border-radius: var(--radius); display: block; margin-bottom: 14px; }
+  .box { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .box-label { font-size: 13px; color: var(--hint); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .box-label b { color: var(--text); font-weight: 600; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 4px 0; }
+  .kv span:first-child { color: var(--hint); }
+  .kv span:last-child { font-weight: 500; text-align: right; }
 
-  .empty { text-align: center; color: var(--hint); padding: 60px 20px; font-size: 14px; }
+  .terms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .term { padding: 10px 0; border-radius: 11px; background: var(--bg); font-weight: 600; font-size: 15px; text-align: center; transition: background .12s; }
+  .term small { display: block; font-size: 11px; font-weight: 500; color: var(--hint); }
+  .term.on { background: var(--accent); color: #fff; }
+  .term.on small { color: rgba(255,255,255,.8); }
 
-  /* Mahsulot detail (pastki panel) */
-  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: flex-end; z-index: 50; }
-  .sheet.open { display: flex; }
-  .sheet-panel { background: var(--bg); width: 100%; max-height: 88vh; border-radius: 16px 16px 0 0; padding: 18px 16px 28px; overflow-y: auto; }
-  .sheet-panel img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 14px; }
-  .sheet-panel h2 { margin: 0 0 4px; font-size: 20px; }
-  .sheet-panel .desc { color: var(--hint); font-size: 13px; margin: 0 0 10px; }
-  .sheet-panel .cash-price { font-size: 15px; margin: 0 0 16px; }
-  .sheet-panel .cash-price b { font-family: 'Fraunces', serif; font-size: 19px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); margin: 6px 0 2px; }
+  .range-scale { display: flex; justify-content: space-between; font-size: 12px; color: var(--hint); }
 
-  .terms-label { font-size: 13px; color: var(--hint); margin-bottom: 8px; }
-  .terms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-  .term-btn {
-    padding: 10px 4px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--card); color: var(--text); font-size: 13px; text-align: center; cursor: pointer;
-  }
-  .term-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .summary { background: linear-gradient(135deg, #0E8A63, #0A6B4D); color: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .summary .lbl { font-size: 13px; opacity: .8; }
+  .summary .big { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; margin: 2px 0 10px; }
+  .summary .big small { font-size: 15px; font-weight: 500; opacity: .8; }
+  .summary .kv span:first-child { color: rgba(255,255,255,.75); }
+  .summary .kv { border-top: 1px solid rgba(255,255,255,.14); padding: 7px 0 0; margin-top: 7px; }
 
-  .plan-summary { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-  .plan-summary .monthly { font-size: 22px; font-weight: 600; font-family: 'Fraunces', serif; }
-  .plan-summary .sub { font-size: 12px; color: var(--hint); margin-top: 4px; }
+  .field { display: block; margin-bottom: 10px; }
+  .field > span { display: block; font-size: 13px; color: var(--hint); margin: 0 4px 6px; }
+  .input { display: flex; align-items: center; background: var(--card); border-radius: 12px; border: 1.5px solid transparent; transition: border-color .15s; box-shadow: var(--shadow); }
+  .input:focus-within { border-color: var(--accent); }
+  .input .pre { padding-left: 13px; color: var(--hint); font-weight: 500; }
+  .input input, .input select, .input textarea { flex: 1; width: 100%; min-width: 0; border: 0; outline: 0; background: none; padding: 13px; font-size: 16px; }
+  .input textarea { resize: vertical; min-height: 70px; }
+  .input.err { border-color: var(--danger); }
+  .hint-err { color: var(--danger); font-size: 13px; margin: -4px 4px 10px; }
+  .note { font-size: 12px; color: var(--hint); text-align: center; margin-top: 10px; line-height: 1.4; }
 
-  .apply-form { display: none; flex-direction: column; gap: 10px; margin-top: 4px; }
-  .apply-form.open { display: flex; }
-  .apply-form input {
-    padding: 12px 13px; border-radius: 8px; border: 1px solid var(--line);
-    background: var(--card); color: var(--text); font-size: 15px; font-family: inherit;
-  }
+  .success { text-align: center; padding: 24px 8px 8px; }
+  .success .ok { width: 76px; height: 76px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin: 0 auto 16px; animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+  .success .ok svg { width: 38px; height: 38px; stroke-width: 2.6; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } }
+  .success h2 { margin: 0 0 6px; font-size: 22px; }
+  .success p { margin: 0 0 20px; color: var(--hint); }
 
-  /* To'lovlarim */
-  .payment-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 0 16px 10px; }
-  .payment-card .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-  .payment-card .pname { font-weight: 500; font-size: 14px; }
-  .payment-card .pstatus { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(31,110,92,0.12); color: var(--accent); }
-  .payment-card .prow { font-size: 13px; color: var(--hint); }
+  /* ---------- To'lovlarim ---------- */
+  .pay { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .pay .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .pay .pname { font-weight: 600; }
+  .pay .pdate { font-size: 12px; color: var(--hint); margin-top: 2px; }
+  .pill { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .pill.new { background: var(--info-soft); color: var(--info); }
+  .pill.contacted { background: var(--warn-soft); color: var(--warn); }
+  .pill.approved { background: var(--accent-soft); color: var(--accent); }
+  .pill.rejected { background: var(--danger-soft); color: var(--danger); }
+  .bar { height: 8px; border-radius: 4px; background: var(--sep); overflow: hidden; margin: 12px 0 6px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 4px; transition: width .4s; }
+  .pay .foot { display: flex; justify-content: space-between; font-size: 13px; color: var(--hint); }
+  .pay .foot b { color: var(--text); font-weight: 600; }
+  .pay .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .pay .stat { background: var(--bg); border-radius: 10px; padding: 8px 10px; }
+  .pay .stat span { display: block; font-size: 11px; color: var(--hint); }
+  .pay .stat b { font-size: 13px; }
 
-  /* Call markaz / Filiallar */
-  .info-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 0 16px 10px; }
-  .info-card .iname { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
-  .info-card .iaddr { font-size: 13px; color: var(--hint); margin-bottom: 8px; }
-  .info-card a.iphone { color: var(--accent); font-size: 14px; text-decoration: none; font-weight: 500; }
+  /* ---------- Filiallar ---------- */
+  .branch { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .branch .bn { font-weight: 600; font-size: 16px; }
+  .branch .ba { color: var(--hint); font-size: 14px; margin: 2px 0 12px; display: flex; gap: 6px; align-items: center; }
+  .branch .ba svg { width: 15px; height: 15px; }
+  .branch .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* ---------- Admin ---------- */
+  .adm { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .adm .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .adm .id { font-weight: 700; }
+  .adm .who { font-weight: 600; font-size: 16px; }
+  .adm .tel { color: var(--link); font-weight: 500; display: inline-flex; align-items: center; gap: 5px; margin: 2px 0 8px; }
+  .adm .tel svg { width: 15px; height: 15px; }
+  .adm .prod { font-size: 14px; background: var(--bg); border-radius: 10px; padding: 9px 11px; margin-bottom: 10px; }
+  .adm .prod .muted { font-size: 13px; }
+  .adm .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .adm .acts .btn { flex: 1; }
+  .stepper { display: flex; align-items: center; gap: 10px; }
+  .stepper button { width: 36px; height: 36px; border-radius: 10px; background: var(--sep); display: grid; place-items: center; }
+  .stepper b { min-width: 48px; text-align: center; }
+
+  .prow { display: flex; align-items: center; gap: 12px; padding: 10px 14px; width: 100%; text-align: left; position: relative; }
+  .prow + .prow::before { content: ""; position: absolute; top: 0; left: 66px; right: 0; height: 1px; background: var(--sep); }
+  .prow img { width: 40px; height: 40px; border-radius: 9px; object-fit: cover; flex: none; }
+  .prow .grow { flex: 1; min-width: 0; }
+  .prow .t { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prow .s { font-size: 13px; color: var(--hint); }
+  .prow.off { opacity: .45; }
+
+  .switch { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+  .switch input { width: 46px; height: 28px; appearance: none; background: var(--sep); border-radius: 14px; position: relative; transition: background .2s; cursor: pointer; margin: 0; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+  .switch input:checked { background: var(--accent); }
+  .switch input:checked::after { transform: translateX(18px); }
+
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: rgba(20,20,20,.9); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; opacity: 0; transition: .2s; z-index: 100; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 </style>
 </head>
 <body>
 
-<header id="topHeader">
-  <h1>Fursat</h1>
-  <div class="tag">telefonlarni bo'lib to'lab sotib oling</div>
-</header>
-
-<div id="screenTitle"></div>
 <div id="app"></div>
 
 <div class="sheet" id="sheet">
-  <div class="sheet-panel" id="sheetPanel"></div>
+  <div class="shade" data-close-sheet></div>
+  <div class="panel" id="sheetPanel"></div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
 const tg = window.Telegram?.WebApp;
-tg?.ready();
-tg?.expand();
+const inTelegram = !!tg?.initData;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  try { tg.setHeaderColor('secondary_bg_color'); tg.setBackgroundColor('secondary_bg_color'); } catch (e) {}
+}
 
-const API_BASE = 'https://bozorcha-backend-production.up.railway.app';
+// Mini app shu backend'ning o'zidan ochilsa — nisbiy manzil, aks holda Railway manzili
+const SAME_ORIGIN = /(^localhost$|^127\.0\.0\.1$|\.up\.railway\.app$)/.test(location.hostname);
+const API_BASE = SAME_ORIGIN ? '' : 'https://bozorcha-backend-production.up.railway.app';
+const MIN_DOWN_PAYMENT_RATE = 0.30; // boshlang'ich to'lov kamida naqd narxining 30%i
 
-// ---------- Holat (navigatsiya) ----------
-let stack = ['home'];              // ekranlar tarixi (orqaga qaytish uchun)
-let selectedCondition = null;      // 'new' | 'used'
-let selectedCategory = null;       // brend id
-let categories = [];
-let terms = [];
-let products = [];
-let applications = [];
-let callCenter = [];
-let branches = [];
+// ---------- Yordamchi funksiyalar ----------
 
-let currentProduct = null;
-let selectedTerm = null;
-let applyMode = false;
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function money(v) {
+  return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + " so'm";
+}
+function shortMoney(v) {
+  if (v >= 1e6) return (Math.round(v / 1e5) / 10).toString().replace('.', ',') + ' mln';
+  if (v >= 1e3) return Math.round(v / 1e3) + ' ming';
+  return String(v);
+}
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s.replace(' ', 'T') + 'Z');
+  const m = ['yan', 'fev', 'mar', 'apr', 'may', 'iyn', 'iyl', 'avg', 'sen', 'okt', 'noy', 'dek'];
+  return `${d.getDate()} ${m[d.getMonth()]}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function haptic(type = 'light') {
+  try {
+    if (['success', 'error', 'warning'].includes(type)) tg?.HapticFeedback?.notificationOccurred(type);
+    else if (type === 'select') tg?.HapticFeedback?.selectionChanged();
+    else tg?.HapticFeedback?.impactOccurred(type);
+  } catch (e) {}
+}
+function toast(text) {
+  const el = $('#toast');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+function alertMsg(text) {
+  if (tg?.showAlert && inTelegram) tg.showAlert(text); else alert(text);
+}
+function openLink(url) {
+  if (tg?.openLink && inTelegram) tg.openLink(url); else window.open(url, '_blank');
+}
+
+const ICONS = {
+  phone: '<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/>',
+  card: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/>',
+  call: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  store: '<path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+  chev: '<path d="m9 18 6-6-6-6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>',
+};
+const icon = (name, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;
+
+// Rasmi yo'q mahsulotlar uchun (masalan admin yangi qo'shganda) oddiy rasm
+function placeholderImage() {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><rect width='240' height='240' fill='#E5EEE9'/><rect x='80' y='28' width='80' height='178' rx='18' fill='#2B3330'/><rect x='86' y='34' width='68' height='166' rx='13' fill='#0E1512'/><rect x='108' y='41' width='24' height='7' rx='3.5' fill='#2B3330'/></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+const imgOf = (p) => p.image_url || placeholderImage();
+
+// ---------- API ----------
 
 function authHeaders() {
   return tg?.initData ? { 'Authorization': 'tma ' + tg.initData } : {};
 }
-function money(v) { return v.toLocaleString('uz-UZ') + " so'm"; }
-const MIN_DOWN_PAYMENT_RATE = 0.30; // boshlang'ich to'lov kamida naqd narxining 30%i
-
-function calcPlan(basePrice, months) {
-  const term = terms.find(t => t.months === months);
-  if (!term) return null;
-  const downPayment = Math.round(basePrice * MIN_DOWN_PAYMENT_RATE);
-  const remaining = basePrice - downPayment;
-  const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
-  const total = remainingWithMarkup + downPayment;
-  const monthly = Math.round(remainingWithMarkup / months);
-  return { months, total, monthly, downPayment };
+async function api(path, opts = {}) {
+  let res;
+  try {
+    res = await fetch(API_BASE + path, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...authHeaders(), ...(opts.headers || {}) },
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+  } catch (e) {
+    throw new Error("Internet bilan aloqa yo'q. Qayta urinib ko'ring.");
+  }
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    const err = new Error(data?.error || `Xatolik (${res.status})`);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 }
+
+// ---------- Holat ----------
+
+const state = {
+  me: null,                  // { id, first_name, is_admin }
+  terms: [],
+  categories: [],
+  products: [],              // barcha faol mahsulotlar
+  applications: null,        // null = hali yuklanmagan
+  callCenter: null,
+  branches: null,
+  condition: 'new',
+  brand: 'all',
+  query: '',
+  model: null,               // tanlangan model_group
+  admin: { tab: 'apps', status: 'new', apps: null, products: null, query: '' },
+};
+let stack = ['home'];
+
+// ---------- Bo'lib to'lash hisob-kitobi (server bilan bir xil formula) ----------
+
+function calcPlan(basePrice, months, downPayment) {
+  const term = state.terms.find(t => t.months === months);
+  if (!term) return null;
+  const dp = downPayment ?? Math.round(basePrice * MIN_DOWN_PAYMENT_RATE);
+  const remaining = basePrice - dp;
+  const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
+  return {
+    months, markup: term.markup, downPayment: dp,
+    total: remainingWithMarkup + dp,
+    monthly: Math.round(remainingWithMarkup / months),
+    overpay: remainingWithMarkup - remaining,
+  };
+}
+const longestTerm = () => state.terms.length ? Math.max(...state.terms.map(t => t.months)) : null;
+function fromMonthly(price) {
+  const m = longestTerm();
+  return m ? calcPlan(price, m).monthly : null;
+}
+
+// ---------- Navigatsiya ----------
 
 function go(screen) {
+  haptic('light');
+  if (screen === 'admin') { state.admin.apps = null; state.admin.products = null; } // har kirganda yangilansin
   stack.push(screen);
-  render();
+  render(true);
+  window.scrollTo(0, 0);
 }
 function goBack() {
+  if ($('#sheet').classList.contains('open')) { closeSheet(); return; }
   if (stack.length > 1) stack.pop();
-  render();
+  render(true);
 }
 tg?.BackButton.onClick(goBack);
 
-// ---------- Ekranlarni chizish ----------
-
-function render() {
+function render(animate = false) {
   const screen = stack[stack.length - 1];
-  document.getElementById('topHeader').style.display = screen === 'home' ? 'block' : 'none';
-  if (tg) { screen === 'home' ? tg.BackButton.hide() : tg.BackButton.show(); }
-
-  const titleEl = document.getElementById('screenTitle');
-  const titles = {
-    condition: 'Sotuvdagi telefonlar', brand: 'Brendni tanlang', models: 'Modelni tanlang',
-    variants: 'Variantni tanlang',
-    payments: "To'lovlarim", callcenter: 'Call markaz', branches: 'Mavjud filiallar',
-  };
-  titleEl.innerHTML = titles[screen] ? `<div class="screen-title">${titles[screen]}</div>` : '';
-
-  const app = document.getElementById('app');
-  if (screen === 'home') app.innerHTML = homeHTML();
-  else if (screen === 'condition') app.innerHTML = conditionHTML();
-  else if (screen === 'brand') app.innerHTML = brandHTML();
-  else if (screen === 'models') app.innerHTML = modelsHTML();
-  else if (screen === 'variants') app.innerHTML = variantsHTML();
-  else if (screen === 'payments') renderPayments();
-  else if (screen === 'callcenter') renderCallCenter();
-  else if (screen === 'branches') renderBranches();
-
-  attachHandlers(screen);
+  if (tg) {
+    if (screen === 'home') tg.BackButton.hide(); else tg.BackButton.show();
+  }
+  const views = { home, catalog, model: modelView, payments, callcenter, branches, admin: adminView };
+  $('#app').innerHTML = `<div class="page${animate ? ' anim' : ''}">${(views[screen] || home)()}</div>`;
+  bind();
+  updateMainButton();
 }
 
-function homeHTML() {
+// Barcha bosiladigan elementlar data-* atributlar orqali ishlaydi
+function bind() {
+  $$('[data-go]').forEach(el => el.onclick = () => go(el.dataset.go));
+  $$('[data-cond]').forEach(el => el.onclick = () => { haptic('select'); state.condition = el.dataset.cond; state.brand = 'all'; render(); });
+  $$('[data-brand]').forEach(el => el.onclick = () => { haptic('select'); state.brand = el.dataset.brand; render(); });
+  $$('[data-model]').forEach(el => el.onclick = () => {
+    const items = modelItems(el.dataset.model);
+    if (items.length === 1) openProduct(items[0].id);
+    else { state.model = el.dataset.model; go('model'); }
+  });
+  $$('[data-product]').forEach(el => el.onclick = () => openProduct(Number(el.dataset.product)));
+  $$('[data-retry]').forEach(el => el.onclick = () => { el.disabled = true; init(); });
+  $$('[data-map]').forEach(el => el.onclick = () => openLink('https://yandex.uz/maps/?text=' + encodeURIComponent(el.dataset.map)));
+
+  const search = $('#search');
+  if (search) {
+    search.oninput = () => {
+      state.query = search.value;
+      $('#catalogResults').innerHTML = catalogResults();
+      bind();
+    };
+  }
+  if (stack[stack.length - 1] === 'admin') bindAdmin();
+}
+
+// ---------- Ekranlar ----------
+
+function home() {
+  const name = tg?.initDataUnsafe?.user?.first_name;
+  const terms = state.terms.map(t => t.months);
+  const range = terms.length ? `${Math.min(...terms)}–${Math.max(...terms)} oy` : '3–9 oy';
+  const active = (state.applications || []).filter(a => a.status !== 'rejected').length;
   return `
-    <div class="menu-grid">
-      <div class="menu-card" data-go="condition"><div class="icon">📱</div><div class="label">Sotuvdagi<br>telefonlar</div></div>
-      <div class="menu-card" data-go="payments"><div class="icon">💳</div><div class="label">To'lovlarim</div></div>
-      <div class="menu-card" data-go="callcenter"><div class="icon">☎️</div><div class="label">Call markaz</div></div>
-      <div class="menu-card" data-go="branches"><div class="icon">🏢</div><div class="label">Mavjud<br>filiallar</div></div>
+    <div class="hero">
+      <div class="hello">${name ? `Salom, ${esc(name)} 👋` : 'Xush kelibsiz 👋'}</div>
+      <h1>Fursat</h1>
+      <p>Orzuingizdagi telefonni bugun oling, pulini bo'lib to'lang.</p>
+      <div class="facts">
+        <span class="fact">${range}</span>
+        <span class="fact">30% boshlang'ich</span>
+        <span class="fact">Yangi va B/U</span>
+      </div>
+      <button class="cta" data-go="catalog">Katalogni ko'rish ${icon('arrow')}</button>
     </div>
+
+    <div class="section-label">Qanday ishlaydi</div>
+    <div class="steps">
+      <div class="step"><b>1</b><span>Telefonni tanlang</span></div>
+      <div class="step"><b>2</b><span>Muddat va to'lovni belgilang</span></div>
+      <div class="step"><b>3</b><span>Ariza qoldiring — o'zimiz qo'ng'iroq qilamiz</span></div>
+    </div>
+
+    <div class="section-label">Menyu</div>
+    <div class="list">
+      ${menuRow('catalog', 'phone', '#0E8A63', 'Sotuvdagi telefonlar', state.products.length ? `${state.products.length} ta telefon sotuvda` : 'Yangi va B/U')}
+      ${menuRow('payments', 'card', '#3E7BFA', "To'lovlarim", active ? `${active} ta faol ariza` : 'Arizalar va to\'lovlar holati')}
+      ${menuRow('callcenter', 'call', '#D9822B', 'Call markaz', "Savollaringizga javob beramiz")}
+      ${menuRow('branches', 'store', '#8B5CF6', 'Filiallar', `${(state.branches || []).length || 3} ta do'kon`)}
+    </div>
+
+    ${state.me?.is_admin ? `
+      <div class="section-label">Boshqaruv</div>
+      <div class="list">${menuRow('admin', 'shield', '#2B3330', 'Admin panel', 'Arizalar va mahsulotlar', state.admin.newCount)}</div>
+    ` : ''}
+  `;
+}
+function menuRow(go, ic, color, t, s, badge) {
+  return `<button class="row" data-go="${go}">
+    <span class="ic" style="background:${color}">${icon(ic)}</span>
+    <span class="grow"><div class="t">${t}</div><div class="s">${esc(s)}</div></span>
+    ${badge ? `<span class="badge">${badge}</span>` : ''}
+    <span class="chev">${icon('chev')}</span>
+  </button>`;
+}
+
+function catalog() {
+  const byCond = state.products.filter(p => p.condition === state.condition);
+  const brandCounts = state.categories.map(c => ({ ...c, n: new Set(byCond.filter(p => p.category_id === c.id).map(p => p.model_group)).size }));
+  return `
+    <div class="title">Telefonlar</div>
+    <div class="segment">
+      <button class="${state.condition === 'new' ? 'on' : ''}" data-cond="new">Yangi</button>
+      <button class="${state.condition === 'used' ? 'on' : ''}" data-cond="used">B/U · yaxshi holatda</button>
+    </div>
+    <label class="search">${icon('search')}<input id="search" type="search" placeholder="Model qidirish" value="${esc(state.query)}" autocomplete="off"></label>
+    <div class="chips">
+      <button class="chip ${state.brand === 'all' ? 'on' : ''}" data-brand="all">Barchasi</button>
+      ${brandCounts.filter(c => c.n > 0).map(c => `
+        <button class="chip ${String(state.brand) === String(c.id) ? 'on' : ''}" data-brand="${c.id}">${esc(c.name)}<span class="n">${c.n}</span></button>
+      `).join('')}
+    </div>
+    <div id="catalogResults">${catalogResults()}</div>
   `;
 }
 
-function conditionHTML() {
-  return `
-    <div class="choice-list">
-      <div class="choice-card" data-condition="new">Yangi telefonlar <span class="arrow">›</span></div>
-      <div class="choice-card" data-condition="used">Ishlatilgan (B/U) yaxshi holatdagi telefonlar <span class="arrow">›</span></div>
-    </div>
-  `;
+function filteredProducts() {
+  const q = state.query.trim().toLowerCase();
+  return state.products.filter(p =>
+    p.condition === state.condition &&
+    (state.brand === 'all' || String(p.category_id) === String(state.brand)) &&
+    (!q || p.name.toLowerCase().includes(q) || p.model_group.toLowerCase().includes(q))
+  );
 }
-
-function brandHTML() {
-  if (categories.length === 0) return `<div class="empty">Yuklanmoqda...</div>`;
-  return `
-    <div class="choice-list">
-      ${categories.map(c => `<div class="choice-card" data-brand="${c.id}">${c.name} <span class="arrow">›</span></div>`).join('')}
-    </div>
-  `;
-}
-
-function modelsHTML() {
-  if (products.length === 0) return `<div class="empty">Bu bo'limda mahsulot yo'q</div>`;
-  const groups = groupByModel(products);
-  const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
-  return `
-    <div class="choice-list">
-      ${groups.map(g => {
-        const cheapest = g.items.reduce((min, p) => p.price < min.price ? p : min, g.items[0]);
-        const fromPlan = longestTerm ? calcPlan(cheapest.price, longestTerm) : null;
-        return `
-        <div class="choice-card" data-group="${g.name}">
-          <div>
-            <div>${g.name}</div>
-            <div style="font-size:12px;font-weight:400;color:var(--hint);margin-top:3px;">
-              ${g.items.length > 1 ? `${g.items.length} ta variant · ` : ''}${money(cheapest.price)}${fromPlan ? ` dan` : ''}
-            </div>
-          </div>
-          <span class="arrow">›</span>
-        </div>`;
-      }).join('')}
-    </div>
-  `;
-}
-
 function groupByModel(list) {
   const map = new Map();
   for (const p of list) {
     if (!map.has(p.model_group)) map.set(p.model_group, []);
     map.get(p.model_group).push(p);
   }
-  return [...map.entries()].map(([name, items]) => ({ name, items }));
+  return [...map.entries()].map(([name, items]) => ({ name, items, min: Math.min(...items.map(i => i.price)) }));
+}
+function modelItems(name) {
+  return state.products.filter(p => p.model_group === name && p.condition === state.condition).sort((a, b) => a.price - b.price);
 }
 
-let currentVariants = [];
+function catalogResults() {
+  if (!state.products.length) return skeletonGrid();
+  const groups = groupByModel(filteredProducts());
+  if (!groups.length) {
+    return `<div class="empty"><div class="em">🔍</div><div class="et">Hech narsa topilmadi</div>Boshqa brend yoki so'zni sinab ko'ring</div>`;
+  }
+  return `<div class="grid">${groups.map(g => {
+    const cheapest = g.items.reduce((a, b) => a.price <= b.price ? a : b);
+    const m = fromMonthly(g.min);
+    return `
+      <button class="card" data-model="${esc(g.name)}">
+        <div class="img"><img src="${esc(imgOf(cheapest))}" alt="" loading="lazy">${state.condition === 'used' ? '<span class="tag">B/U</span>' : ''}</div>
+        <div class="body">
+          <div class="name">${esc(g.name)}</div>
+          <div class="meta">${g.items.length > 1 ? `${g.items.length} ta variant · eng arzoni` : esc(cheapest.description || '')}</div>
+          <div class="price">${money(g.min)}</div>
+          ${m ? `<span class="monthly">${shortMoney(m)}/oy dan</span>` : ''}
+        </div>
+      </button>`;
+  }).join('')}</div>`;
+}
+function skeletonGrid() {
+  return `<div class="grid">${'<div class="skel" style="height:250px"></div>'.repeat(4)}</div>`;
+}
 
-function variantsHTML() {
-  const longestTerm = terms.length ? Math.max(...terms.map(t => t.months)) : null;
+function modelView() {
+  const items = modelItems(state.model);
   return `
-    <div class="grid">
-      ${currentVariants.map(p => {
-        const fromPlan = longestTerm ? calcPlan(p.price, longestTerm) : null;
+    <div class="title">${esc(state.model)}</div>
+    <div class="vlist">
+      ${items.map(p => {
+        const m = fromMonthly(p.price);
         return `
-        <div class="product" data-product="${p.id}">
-          <img src="${p.image_url}" alt="${p.name}" loading="lazy">
-          <div class="info">
-            <p class="name">${p.name}</p>
-            <p class="price">${money(p.price)}</p>
-            ${fromPlan ? `<span class="from">${fromPlan.months} oyga: ${money(fromPlan.monthly)}/oy dan</span>` : ''}
+        <button class="vrow" data-product="${p.id}">
+          <img src="${esc(imgOf(p))}" alt="" loading="lazy">
+          <div class="grow">
+            <div class="name">${esc(p.name.replace(state.model, '').replace(/^[\s,]+/, '') || p.name)}</div>
+            <div class="meta">${esc(p.description || '')}</div>
+            <div class="price">${money(p.price)}</div>
+            ${m ? `<div class="monthly">oyiga ${money(m)} dan</div>` : ''}
           </div>
-        </div>`;
+          <span class="muted">${icon('chev')}</span>
+        </button>`;
       }).join('')}
     </div>
   `;
 }
 
-async function renderPayments() {
-  const app = document.getElementById('app');
-  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
-  if (applications.length === 0) {
-    const res = await fetch(`${API_BASE}/api/applications`, { headers: authHeaders() });
-    applications = res.ok ? await res.json() : [];
+function payments() {
+  if (!inTelegram && !SAME_ORIGIN) {
+    return `<div class="title">To'lovlarim</div><div class="empty"><div class="em">🔒</div><div class="et">Telegram orqali oching</div>Arizalaringizni ko'rish uchun ilovani bot ichidan oching.</div>`;
   }
-  if (applications.length === 0) {
-    app.innerHTML = `<div class="empty">Hali arizangiz yo'q</div>`;
-    return;
+  if (state.applications === null) {
+    loadApplications();
+    return `<div class="title">To'lovlarim</div>${'<div class="skel" style="height:150px;margin-bottom:10px"></div>'.repeat(2)}`;
   }
-  const statusLabels = { new: 'Yangi', contacted: 'Bog\'lanildi', approved: 'Tasdiqlandi', rejected: 'Rad etildi' };
-  app.innerHTML = applications.map(a => {
-    const pct = a.term_months > 0 ? Math.round((a.paid_installments / a.term_months) * 100) : 0;
-    return `
-    <div class="payment-card">
+  if (state.applications.error) return `<div class="title">To'lovlarim</div>${errorView(state.applications.error)}`;
+  if (!state.applications.length) {
+    return `<div class="title">To'lovlarim</div>
+      <div class="empty"><div class="em">💳</div><div class="et">Hali arizangiz yo'q</div>Telefon tanlab, bir necha daqiqada ariza qoldiring.
+      <div><button class="btn" data-go="catalog">Katalogga o'tish</button></div></div>`;
+  }
+  return `<div class="title">To'lovlarim</div>${state.applications.map(payCard).join('')}`;
+}
+
+const STATUS = {
+  new: "Ko'rib chiqilmoqda",
+  contacted: "Bog'lanildi",
+  approved: 'Tasdiqlandi',
+  rejected: 'Rad etildi',
+};
+function payCard(a) {
+  const pct = a.term_months ? Math.round(a.paid_installments / a.term_months * 100) : 0;
+  const left = Math.max(0, a.total_price - a.down_payment - a.paid_installments * a.monthly_payment);
+  return `
+    <div class="pay">
       <div class="top">
-        <span class="pname">${a.product_name}${a.is_demo ? ' <span style="font-weight:400;color:var(--hint);font-size:11px;">(namuna)</span>' : ''}</span>
-        <span class="pstatus">${statusLabels[a.status] || a.status}</span>
+        <div><div class="pname">${esc(a.product_name)}</div><div class="pdate">Ariza #${a.id} · ${fmtDate(a.created_at)}</div></div>
+        <span class="pill ${esc(a.status)}">${STATUS[a.status] || esc(a.status)}</span>
       </div>
-      <div class="prow">${a.term_months} oyga · ${money(a.monthly_payment)}/oy · jami ${money(a.total_price)}</div>
-      <div style="margin-top:8px;background:var(--line);border-radius:6px;height:6px;overflow:hidden;">
-        <div style="width:${pct}%;background:var(--accent);height:100%;"></div>
+      ${a.status === 'approved' ? `
+        <div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="foot"><span><b>${a.paid_installments}</b> / ${a.term_months} oy to'langan</span><span>${pct}%</span></div>
+      ` : ''}
+      <div class="stats">
+        <div class="stat"><span>Oylik</span><b>${shortMoney(a.monthly_payment)}</b></div>
+        <div class="stat"><span>Muddat</span><b>${a.term_months} oy</b></div>
+        <div class="stat"><span>${a.status === 'approved' ? 'Qoldi' : 'Jami'}</span><b>${shortMoney(a.status === 'approved' ? left : a.total_price)}</b></div>
       </div>
-      <div class="prow" style="margin-top:4px;">${a.paid_installments}/${a.term_months} oy to'langan (${pct}%)</div>
+    </div>`;
+}
+
+function callcenter() {
+  if (state.callCenter === null) { loadInfo(); return `<div class="title">Call markaz</div><div class="skel" style="height:180px"></div>`; }
+  const colors = ['#0E8A63', '#3E7BFA', '#D9822B'];
+  return `
+    <div class="title">Call markaz</div>
+    <div class="list">
+      ${state.callCenter.map((c, i) => `
+        <a class="row" href="tel:${esc(c.phone.replace(/\s/g, ''))}">
+          <span class="ic" style="background:${colors[i % colors.length]}">${icon('call')}</span>
+          <span class="grow"><div class="t">${esc(c.phone)}</div><div class="s">${esc(c.label)}</div></span>
+          <span class="chev">${icon('chev')}</span>
+        </a>`).join('')}
     </div>
+    <p class="note">Har kuni 9:00 dan 20:00 gacha</p>
   `;
-  }).join('');
 }
 
-async function renderCallCenter() {
-  const app = document.getElementById('app');
-  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
-  if (callCenter.length === 0) {
-    const res = await fetch(`${API_BASE}/api/call-center`);
-    callCenter = await res.json();
-  }
-  app.innerHTML = callCenter.map(c => `
-    <div class="info-card">
-      <div class="iname">${c.label}</div>
-      <a class="iphone" href="tel:${c.phone}">${c.phone}</a>
-    </div>
-  `).join('');
+function branches() {
+  if (state.branches === null) { loadInfo(); return `<div class="title">Filiallar</div>${'<div class="skel" style="height:130px;margin-bottom:10px"></div>'.repeat(3)}`; }
+  return `
+    <div class="title">Filiallar</div>
+    ${state.branches.map(b => `
+      <div class="branch">
+        <div class="bn">${esc(b.name)}</div>
+        <div class="ba">${icon('pin')}${esc(b.address)}</div>
+        <div class="acts">
+          <a class="btn ghost sm" href="tel:${esc(b.phone.replace(/\s/g, ''))}">${icon('call')} Qo'ng'iroq</a>
+          <button class="btn soft sm" data-map="${esc('Fursat ' + b.address)}">${icon('map')} Xaritada</button>
+        </div>
+      </div>`).join('')}
+  `;
 }
 
-async function renderBranches() {
-  const app = document.getElementById('app');
-  app.innerHTML = `<div class="empty">Yuklanmoqda...</div>`;
-  if (branches.length === 0) {
-    const res = await fetch(`${API_BASE}/api/branches`);
-    branches = await res.json();
-  }
-  app.innerHTML = branches.map(b => `
-    <div class="info-card">
-      <div class="iname">${b.name}</div>
-      <div class="iaddr">${b.address}</div>
-      <a class="iphone" href="tel:${b.phone}">${b.phone}</a>
-    </div>
-  `).join('');
-}
-
-function attachHandlers(screen) {
-  document.querySelectorAll('[data-go]').forEach(el => {
-    el.onclick = () => go(el.dataset.go);
-  });
-  document.querySelectorAll('[data-condition]').forEach(el => {
-    el.onclick = () => {
-      selectedCondition = el.dataset.condition;
-      go('brand');
-    };
-  });
-  document.querySelectorAll('[data-brand]').forEach(el => {
-    el.onclick = async () => {
-      selectedCategory = el.dataset.brand;
-      await loadProducts();
-      go('models');
-    };
-  });
-  document.querySelectorAll('[data-group]').forEach(el => {
-    el.onclick = () => {
-      const group = groupByModel(products).find(g => g.name === el.dataset.group);
-      if (group.items.length === 1) {
-        openProduct(group.items[0].id);
-      } else {
-        currentVariants = group.items;
-        go('variants');
-      }
-    };
-  });
-  document.querySelectorAll('[data-product]').forEach(el => {
-    el.onclick = () => openProduct(Number(el.dataset.product));
-  });
+function errorView(msg) {
+  return `<div class="empty"><div class="em">⚠️</div><div class="et">Yuklab bo'lmadi</div>${esc(msg)}
+    <div><button class="btn" data-retry>Qayta urinish</button></div></div>`;
 }
 
 // ---------- Ma'lumot yuklash ----------
 
-async function loadTerms() {
-  const res = await fetch(`${API_BASE}/api/installment-terms`);
-  terms = await res.json();
+async function loadApplications() {
+  try { state.applications = await api('/api/applications'); }
+  catch (e) { state.applications = { error: e.message }; }
+  render();
 }
-async function loadCategories() {
-  const res = await fetch(`${API_BASE}/api/categories`);
-  categories = await res.json();
-}
-async function loadProducts() {
-  const url = `${API_BASE}/api/products?category_id=${selectedCategory}&condition=${selectedCondition}`;
-  const res = await fetch(url);
-  products = await res.json();
+async function loadInfo() {
+  if (loadInfo.busy) return;
+  loadInfo.busy = true;
+  try {
+    const [cc, br] = await Promise.all([api('/api/call-center'), api('/api/branches')]);
+    state.callCenter = cc; state.branches = br;
+  } catch (e) {
+    state.callCenter = state.callCenter || []; state.branches = state.branches || [];
+    toast(e.message);
+  }
+  loadInfo.busy = false;
+  render();
 }
 
-// ---------- Mahsulot detail (pastki panel) ----------
+// ---------- Mahsulot paneli va ariza ----------
+
+const sheet = { mode: null, product: null, term: null, dpPct: 30, name: '', phone: '', errors: {}, sending: false, result: null, edit: null };
+
+function openSheet() {
+  $('#sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  tg?.BackButton.show();
+}
+function closeSheet() {
+  $('#sheet').classList.remove('open');
+  document.body.style.overflow = '';
+  sheet.mode = null;
+  if (stack.length === 1) tg?.BackButton.hide();
+  updateMainButton();
+}
+$$('[data-close-sheet]').forEach(el => el.onclick = closeSheet);
 
 function openProduct(id) {
-  currentProduct = products.find(p => p.id === id);
-  selectedTerm = null;
-  applyMode = false;
+  haptic('light');
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  Object.assign(sheet, {
+    mode: 'product', product: p, term: longestTerm() >= 6 ? 6 : longestTerm(), dpPct: 30,
+    name: sheet.name || tg?.initDataUnsafe?.user?.first_name || '',
+    errors: {}, sending: false, result: null,
+  });
   renderSheet();
-  document.getElementById('sheet').classList.add('open');
+  openSheet();
+  $('#sheetPanel').scrollTop = 0;
+}
+
+function currentPlan() {
+  const p = sheet.product;
+  const dp = Math.max(Math.round(p.price * MIN_DOWN_PAYMENT_RATE), Math.round(p.price * sheet.dpPct / 100));
+  return calcPlan(p.price, sheet.term, dp);
 }
 
 function renderSheet() {
-  const p = currentProduct;
-  const panel = document.getElementById('sheetPanel');
-  const plan = selectedTerm ? calcPlan(p.price, selectedTerm) : null;
-
-  panel.innerHTML = `
-    <img src="${p.image_url}" alt="${p.name}">
-    <h2>${p.name}</h2>
-    <p class="desc">${p.description || ''}</p>
-    <p class="cash-price">Naqd narxi: <b>${money(p.price)}</b></p>
-    <p class="cash-price" style="margin-top:-12px;font-size:13px;color:var(--hint);">Boshlang'ich to'lov (kamida 30%): <b style="font-size:14px;">${money(Math.round(p.price * MIN_DOWN_PAYMENT_RATE))}</b></p>
-
-    <p class="terms-label">Muddatni tanlang:</p>
-    <div class="terms" id="termsRow">
-      ${terms.map(t => `<div class="term-btn ${selectedTerm === t.months ? 'active' : ''}" data-months="${t.months}">${t.months} oy</div>`).join('')}
-    </div>
-
-    ${plan ? `
-      <div class="plan-summary">
-        <div class="monthly">${money(plan.monthly)}<span style="font-size:13px;font-weight:400;color:var(--hint)"> / oy</span></div>
-        <div class="sub">${plan.months} oyga jami: ${money(plan.total)} (boshlang'ich to'lov bilan)</div>
-      </div>
-    ` : ''}
-
-    <div class="apply-form ${applyMode ? 'open' : ''}" id="applyForm">
-      <input type="text" id="custName" placeholder="Ismingiz">
-      <input type="tel" id="custPhone" placeholder="Telefon raqamingiz">
-    </div>
-  `;
-
-  panel.querySelectorAll('.term-btn').forEach(btn => {
-    btn.onclick = () => {
-      selectedTerm = Number(btn.dataset.months);
-      renderSheet();
-      updateMainButton();
-    };
-  });
-
+  const panel = $('#sheetPanel');
+  if (sheet.mode === 'product') panel.innerHTML = sheet.result ? successHTML() : productHTML();
+  else if (sheet.mode === 'edit') panel.innerHTML = editProductHTML();
+  bindSheet();
   updateMainButton();
 }
 
-function updateMainButton() {
-  if (!tg) return;
-  const sheetOpen = document.getElementById('sheet').classList.contains('open');
-  if (!sheetOpen || !selectedTerm) { tg.MainButton.hide(); return; }
-  const plan = calcPlan(currentProduct.price, selectedTerm);
-  tg.MainButton.setText(!applyMode ? `Ariza qoldirish · ${money(plan.monthly)}/oy` : 'Arizani yuborish');
-  tg.MainButton.show();
+function productHTML() {
+  const p = sheet.product;
+  const plan = currentPlan();
+  return `
+    <div class="grab"></div>
+    <div class="sheet-head">
+      <div class="grow">
+        <h2>${esc(p.name)}</h2>
+        <div class="muted" style="font-size:14px;margin-top:3px">${esc(p.description || '')}</div>
+      </div>
+      <button class="close" data-close-sheet>${icon('x')}</button>
+    </div>
+    <img class="pimg" src="${esc(imgOf(p))}" alt="">
+
+    <div class="box">
+      <div class="kv"><span>Naqd narxi</span><span style="font-size:17px;font-weight:700">${money(p.price)}</span></div>
+      <div class="kv"><span>Holati</span><span>${p.condition === 'used' ? 'Ishlatilgan (B/U)' : 'Yangi'}</span></div>
+    </div>
+
+    <div class="box">
+      <div class="box-label">Muddat <b>${sheet.term} oy</b></div>
+      <div class="terms">
+        ${state.terms.map(t => `<button class="term ${sheet.term === t.months ? 'on' : ''}" data-term="${t.months}">${t.months}<small>oy</small></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-label">Boshlang'ich to'lov <b id="dpVal">${money(plan.downPayment)} · ${sheet.dpPct}%</b></div>
+      <input type="range" id="dp" min="30" max="80" step="5" value="${sheet.dpPct}">
+      <div class="range-scale"><span>30%</span><span>Ko'proq to'lasangiz, oylik kamayadi</span><span>80%</span></div>
+    </div>
+
+    <div class="summary" id="summary">${summaryHTML(plan)}</div>
+
+    <div class="section-label" style="margin-top:18px">Ariza uchun ma'lumotlar</div>
+    <label class="field">
+      <div class="input ${sheet.errors.name ? 'err' : ''}"><input id="custName" placeholder="Ismingiz" value="${esc(sheet.name)}" autocomplete="name" maxlength="100"></div>
+    </label>
+    ${sheet.errors.name ? `<div class="hint-err">${esc(sheet.errors.name)}</div>` : ''}
+    <label class="field">
+      <div class="input ${sheet.errors.phone ? 'err' : ''}"><span class="pre">+998</span><input id="custPhone" type="tel" inputmode="numeric" placeholder="90 123 45 67" value="${esc(sheet.phone)}" autocomplete="tel"></div>
+    </label>
+    ${sheet.errors.phone ? `<div class="hint-err">${esc(sheet.errors.phone)}</div>` : ''}
+
+    ${inTelegram ? '' : `<button class="btn block" id="submitBtn" ${sheet.sending ? 'disabled' : ''}>${sheet.sending ? 'Yuborilmoqda…' : `Ariza yuborish · ${money(plan.monthly)}/oy`}</button>`}
+    <p class="note">Ariza majburiyat emas. Operatorimiz qo'ng'iroq qilib, shartlarni tushuntiradi va hujjatlarni aytadi.</p>
+  `;
+}
+function summaryHTML(plan) {
+  return `
+    <div class="lbl">Oylik to'lov</div>
+    <div class="big">${money(plan.monthly)} <small>× ${plan.months} oy</small></div>
+    <div class="kv"><span>Boshlang'ich to'lov</span><span>${money(plan.downPayment)}</span></div>
+    <div class="kv"><span>Ustama (${Math.round(plan.markup * 100)}%)</span><span>${money(plan.overpay)}</span></div>
+    <div class="kv"><span>Jami to'lanadi</span><span>${money(plan.total)}</span></div>
+  `;
+}
+function successHTML() {
+  const r = sheet.result;
+  return `
+    <div class="grab"></div>
+    <div class="success">
+      <div class="ok">${icon('check')}</div>
+      <h2>Ariza qabul qilindi!</h2>
+      <p>Ariza #${r.application_id}. Operatorimiz tez orada <b style="white-space:nowrap">${esc(sheet.phoneFormatted)}</b> raqamiga qo'ng'iroq qiladi.</p>
+      <div class="box" style="text-align:left">
+        <div class="kv"><span>Telefon</span><span>${esc(sheet.product.name)}</span></div>
+        <div class="kv"><span>Oylik to'lov</span><span>${money(r.monthly_payment)} × ${r.months} oy</span></div>
+        <div class="kv"><span>Boshlang'ich</span><span>${money(r.down_payment)}</span></div>
+      </div>
+      <button class="btn block" id="toPayments">To'lovlarimga o'tish</button>
+      <button class="btn soft block" data-close-sheet style="margin-top:8px">Yopish</button>
+    </div>
+  `;
 }
 
-tg?.MainButton.onClick(async () => {
-  if (!currentProduct || !selectedTerm) return;
+function bindSheet() {
+  const panel = $('#sheetPanel');
+  $$('[data-close-sheet]', panel).forEach(el => el.onclick = closeSheet);
 
-  if (!applyMode) {
-    applyMode = true;
+  if (sheet.mode === 'product' && !sheet.result) {
+    $$('[data-term]', panel).forEach(el => el.onclick = () => { haptic('select'); sheet.term = Number(el.dataset.term); renderSheet(); });
+    const dp = $('#dp');
+    dp.oninput = () => {
+      sheet.dpPct = Number(dp.value);
+      const plan = currentPlan();
+      $('#dpVal').textContent = `${money(plan.downPayment)} · ${sheet.dpPct}%`;
+      $('#summary').innerHTML = summaryHTML(plan);
+      const btn = $('#submitBtn');
+      if (btn) btn.textContent = `Ariza yuborish · ${money(plan.monthly)}/oy`;
+      updateMainButton();
+    };
+    dp.onchange = () => haptic('select');
+    $('#custName').oninput = (e) => { sheet.name = e.target.value; };
+    const phone = $('#custPhone');
+    phone.oninput = () => {
+      let d = phone.value.replace(/\D/g, '');
+      if (d.length > 9 && d.startsWith('998')) d = d.slice(3);
+      d = d.slice(0, 9);
+      phone.value = [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+      sheet.phone = phone.value;
+    };
+    const btn = $('#submitBtn');
+    if (btn) btn.onclick = submitApplication;
+  }
+  if (sheet.mode === 'product' && sheet.result) {
+    $('#toPayments').onclick = () => { closeSheet(); stack = ['home', 'payments']; render(); };
+  }
+  if (sheet.mode === 'edit') bindEditProduct();
+}
+
+async function submitApplication() {
+  if (sheet.sending) return;
+  const digits = sheet.phone.replace(/\D/g, '');
+  sheet.errors = {};
+  if (!sheet.name.trim()) sheet.errors.name = 'Ismingizni kiriting';
+  if (digits.length !== 9) sheet.errors.phone = "Raqamni to'liq kiriting: 90 123 45 67";
+  if (Object.keys(sheet.errors).length) {
+    haptic('error');
+    renderSheet();
+    $('#sheetPanel').scrollTo({ top: $('#sheetPanel').scrollHeight, behavior: 'smooth' });
+    return;
+  }
+  const plan = currentPlan();
+  sheet.sending = true;
+  renderSheet();
+  try {
+    sheet.result = await api('/api/applications', {
+      method: 'POST',
+      body: {
+        product_id: sheet.product.id,
+        term_months: plan.months,
+        down_payment: plan.downPayment,
+        customer_name: sheet.name.trim(),
+        customer_phone: '998' + digits,
+      },
+    });
+    sheet.phoneFormatted = '+998 ' + sheet.phone;
+    state.applications = null; // "To'lovlarim" qayta yuklansin
+    if (state.me?.is_admin) loadAdminApps();
+    haptic('success');
+  } catch (e) {
+    haptic('error');
+    alertMsg(e.status === 401 ? "Ilovani Telegram bot orqali oching, so'ng qayta urinib ko'ring." : e.message);
+  }
+  sheet.sending = false;
+  renderSheet();
+  $('#sheetPanel').scrollTop = 0;
+}
+
+// Telegram'ning pastki katta tugmasi
+let mainAction = null;
+function updateMainButton() {
+  if (!tg?.MainButton || !inTelegram) return;
+  const mb = tg.MainButton;
+  const open = $('#sheet').classList.contains('open');
+  mainAction = null;
+  if (open && sheet.mode === 'product' && !sheet.result) {
+    const plan = currentPlan();
+    mainAction = submitApplication;
+    mb.setParams({ text: sheet.sending ? 'Yuborilmoqda…' : `Ariza yuborish · ${money(plan.monthly)}/oy`, color: '#0E8A63', text_color: '#ffffff', is_active: !sheet.sending, is_visible: true });
+    if (sheet.sending) mb.showProgress(); else mb.hideProgress();
+  } else if (open && sheet.mode === 'edit') {
+    mainAction = saveProduct;
+    mb.setParams({ text: sheet.edit?.id ? 'Saqlash' : "Mahsulotni qo'shish", color: '#0E8A63', text_color: '#ffffff', is_active: true, is_visible: true });
+    mb.hideProgress();
+  } else {
+    mb.hide();
+  }
+}
+tg?.MainButton.onClick(() => mainAction && mainAction());
+
+// ---------- Admin panel ----------
+
+function adminView() {
+  const a = state.admin;
+  return `
+    <div class="title">Admin panel</div>
+    <div class="segment">
+      <button class="${a.tab === 'apps' ? 'on' : ''}" data-atab="apps">Arizalar</button>
+      <button class="${a.tab === 'products' ? 'on' : ''}" data-atab="products">Mahsulotlar</button>
+    </div>
+    ${a.tab === 'apps' ? adminApps() : adminProducts()}
+  `;
+}
+
+function adminApps() {
+  const a = state.admin;
+  if (a.apps === null) { loadAdminApps(); return '<div class="skel" style="height:200px"></div>'; }
+  if (a.apps.error) return errorView(a.apps.error);
+  const counts = { all: a.apps.length };
+  for (const x of a.apps) counts[x.status] = (counts[x.status] || 0) + 1;
+  const list = a.status === 'all' ? a.apps : a.apps.filter(x => x.status === a.status);
+  const filters = [['new', 'Yangi'], ['contacted', "Bog'lanildi"], ['approved', 'Tasdiqlangan'], ['rejected', 'Rad etilgan'], ['all', 'Hammasi']];
+  return `
+    <div class="chips">
+      ${filters.map(([k, l]) => `<button class="chip ${a.status === k ? 'on' : ''}" data-astatus="${k}">${l}<span class="n">${counts[k] || 0}</span></button>`).join('')}
+    </div>
+    ${list.length ? list.map(adminAppCard).join('') : `<div class="empty"><div class="em">📭</div><div class="et">Bu bo'limda ariza yo'q</div></div>`}
+  `;
+}
+function adminAppCard(x) {
+  const tel = x.customer_phone.replace(/\s/g, '');
+  let acts = '';
+  if (x.status === 'new') acts = `<button class="btn ghost sm" data-aset="${x.id}:contacted">Bog'lanildi</button>`;
+  if (x.status === 'new' || x.status === 'contacted') {
+    acts += `<button class="btn sm" data-aset="${x.id}:approved">Tasdiqlash</button><button class="btn danger sm" data-aset="${x.id}:rejected">Rad etish</button>`;
+  }
+  const paid = x.status === 'approved' ? `
+    <div class="kv" style="align-items:center;margin-top:4px">
+      <span>To'langan oylar</span>
+      <span class="stepper">
+        <button data-apay="${x.id}:-1" ${x.paid_installments <= 0 ? 'disabled' : ''}>${icon('minus')}</button>
+        <b>${x.paid_installments} / ${x.term_months}</b>
+        <button data-apay="${x.id}:1" ${x.paid_installments >= x.term_months ? 'disabled' : ''}>${icon('plus')}</button>
+      </span>
+    </div>` : '';
+  return `
+    <div class="adm">
+      <div class="top"><span class="id">#${x.id} <span class="muted" style="font-weight:400;font-size:13px">· ${fmtDate(x.created_at)}</span></span><span class="pill ${esc(x.status)}">${STATUS[x.status] || esc(x.status)}</span></div>
+      <div class="who">${esc(x.customer_name)}</div>
+      <a class="tel" href="tel:${esc(tel)}">${icon('call')}${esc(x.customer_phone)}</a>
+      <div class="prod">
+        <div>${esc(x.product_name)}</div>
+        <div class="muted">${money(x.down_payment)} + ${x.term_months} × ${money(x.monthly_payment)} = <b style="color:var(--text)">${money(x.total_price)}</b></div>
+      </div>
+      ${acts ? `<div class="acts">${acts}</div>` : ''}
+      ${paid}
+    </div>`;
+}
+
+function adminProducts() {
+  const a = state.admin;
+  if (a.products === null) { loadAdminProducts(); return '<div class="skel" style="height:300px"></div>'; }
+  if (a.products.error) return errorView(a.products.error);
+  const q = a.query.trim().toLowerCase();
+  const list = a.products.filter(p => !q || p.name.toLowerCase().includes(q));
+  const catName = (id) => state.categories.find(c => c.id === id)?.name || '';
+  return `
+    <button class="btn block" data-anew style="margin-bottom:12px">${icon('plus')} Yangi mahsulot</button>
+    <label class="search">${icon('search')}<input id="adminSearch" type="search" placeholder="Qidirish" value="${esc(a.query)}" autocomplete="off"></label>
+    <div class="list" id="adminProductList">
+      ${list.map(p => `
+        <button class="prow ${p.is_active ? '' : 'off'}" data-aedit="${p.id}">
+          <img src="${esc(imgOf(p))}" alt="">
+          <span class="grow"><div class="t">${esc(p.name)}</div><div class="s">${esc(catName(p.category_id))} · ${p.condition === 'used' ? 'B/U' : 'Yangi'}${p.is_active ? '' : ' · yashirin'}</div></span>
+          <b style="font-size:14px;white-space:nowrap">${shortMoney(p.price)}</b>
+        </button>`).join('') || '<div class="empty">Topilmadi</div>'}
+    </div>
+  `;
+}
+
+function bindAdmin() {
+  $$('[data-atab]').forEach(el => el.onclick = () => { haptic('select'); state.admin.tab = el.dataset.atab; render(); });
+  $$('[data-astatus]').forEach(el => el.onclick = () => { haptic('select'); state.admin.status = el.dataset.astatus; render(); });
+  $$('[data-aset]').forEach(el => el.onclick = () => {
+    const [id, status] = el.dataset.aset.split(':');
+    updateApp(Number(id), { status });
+  });
+  $$('[data-apay]').forEach(el => el.onclick = () => {
+    const [id, d] = el.dataset.apay.split(':');
+    updateApp(Number(id), { paid_delta: Number(d) });
+  });
+  $$('[data-aedit]').forEach(el => el.onclick = () => openEditProduct(state.admin.products.find(p => p.id === Number(el.dataset.aedit))));
+  $$('[data-anew]').forEach(el => el.onclick = () => openEditProduct(null));
+  const s = $('#adminSearch');
+  if (s) s.oninput = () => {
+    state.admin.query = s.value;
+    const pos = s.selectionStart;
+    render();
+    const n = $('#adminSearch'); n.focus(); n.setSelectionRange(pos, pos);
+  };
+}
+
+async function loadAdminApps() {
+  try { state.admin.apps = await api('/api/admin/applications'); }
+  catch (e) { state.admin.apps = { error: e.message }; }
+  state.admin.newCount = Array.isArray(state.admin.apps) ? state.admin.apps.filter(x => x.status === 'new').length : 0;
+  render();
+}
+async function loadAdminProducts() {
+  try { state.admin.products = await api('/api/admin/products'); }
+  catch (e) { state.admin.products = { error: e.message }; }
+  render();
+}
+async function updateApp(id, body) {
+  try {
+    const row = await api(`/api/admin/applications/${id}`, { method: 'PATCH', body });
+    state.admin.apps = state.admin.apps.map(x => x.id === id ? row : x);
+    state.admin.newCount = state.admin.apps.filter(x => x.status === 'new').length;
+    haptic(body.status ? 'success' : 'light');
+    if (body.status) toast(`#${id}: ${STATUS[body.status]}`);
+    render();
+  } catch (e) { haptic('error'); toast(e.message); }
+}
+
+function openEditProduct(p) {
+  sheet.mode = 'edit';
+  sheet.edit = p ? { ...p } : {
+    category_id: state.categories[0]?.id, condition: 'new', model_group: '', name: '', description: '', price: '', is_active: 1,
+  };
+  sheet.errors = {};
+  renderSheet();
+  openSheet();
+  $('#sheetPanel').scrollTop = 0;
+}
+function editProductHTML() {
+  const e = sheet.edit;
+  return `
+    <div class="grab"></div>
+    <div class="sheet-head">
+      <div class="grow"><h2>${e.id ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot'}</h2></div>
+      <button class="close" data-close-sheet>${icon('x')}</button>
+    </div>
+    <label class="field"><span>Brend</span><div class="input"><select id="eCat">
+      ${state.categories.map(c => `<option value="${c.id}" ${c.id === Number(e.category_id) ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+    </select></div></label>
+    <label class="field"><span>Holati</span><div class="input"><select id="eCond">
+      <option value="new" ${e.condition === 'new' ? 'selected' : ''}>Yangi</option>
+      <option value="used" ${e.condition === 'used' ? 'selected' : ''}>Ishlatilgan (B/U)</option>
+    </select></div></label>
+    <label class="field"><span>Model (variantlarni guruhlaydi)</span><div class="input"><input id="eGroup" value="${esc(e.model_group)}" placeholder="iPhone 17 Pro Max"></div></label>
+    <label class="field"><span>To'liq nomi</span><div class="input"><input id="eName" value="${esc(e.name)}" placeholder="iPhone 17 Pro Max 256GB Qora"></div></label>
+    <label class="field"><span>Tavsif</span><div class="input"><input id="eDesc" value="${esc(e.description || '')}" placeholder="256GB, Qora, Neverlock"></div></label>
+    <label class="field"><span>Naqd narxi (so'm)</span><div class="input"><input id="ePrice" type="text" inputmode="numeric" value="${e.price ? String(e.price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : ''}" placeholder="12 500 000"></div></label>
+    <div class="switch"><span>Katalogda ko'rinsin</span><input type="checkbox" id="eActive" ${e.is_active ? 'checked' : ''}></div>
+    ${sheet.errors.form ? `<div class="hint-err" style="margin:4px">${esc(sheet.errors.form)}</div>` : ''}
+    ${inTelegram ? '' : `<button class="btn block" id="saveBtn">${e.id ? 'Saqlash' : "Qo'shish"}</button>`}
+  `;
+}
+function bindEditProduct() {
+  const price = $('#ePrice');
+  price.oninput = () => { const d = price.value.replace(/\D/g, ''); price.value = d.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
+  const btn = $('#saveBtn');
+  if (btn) btn.onclick = saveProduct;
+}
+async function saveProduct() {
+  const e = sheet.edit;
+  const body = {
+    category_id: Number($('#eCat').value),
+    condition: $('#eCond').value,
+    model_group: $('#eGroup').value.trim(),
+    name: $('#eName').value.trim(),
+    description: $('#eDesc').value.trim(),
+    price: Number($('#ePrice').value.replace(/\D/g, '')),
+    is_active: $('#eActive').checked ? 1 : 0,
+  };
+  if (!body.model_group || !body.name || !body.price) {
+    sheet.edit = { ...e, ...body };
+    sheet.errors = { form: "Model, nomi va narxini to'ldiring" };
+    haptic('error');
     renderSheet();
     return;
   }
+  try {
+    const saved = e.id
+      ? await api(`/api/admin/products/${e.id}`, { method: 'PATCH', body })
+      : await api('/api/admin/products', { method: 'POST', body });
+    const list = state.admin.products || [];
+    state.admin.products = e.id ? list.map(p => p.id === saved.id ? saved : p) : [...list, saved];
+    haptic('success');
+    toast(e.id ? 'Saqlandi' : "Qo'shildi");
+    closeSheet();
+    reloadProducts();
+    render();
+  } catch (err) { haptic('error'); toast(err.message); }
+}
 
-  const name = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('custPhone').value.trim();
-  if (!name || !phone) {
-    tg.HapticFeedback?.notificationOccurred('error');
-    tg.showAlert('Iltimos, ismingiz va telefon raqamingizni kiriting');
-    return;
-  }
-
-  const res = await fetch(`${API_BASE}/api/applications`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify({
-      product_id: currentProduct.id,
-      term_months: selectedTerm,
-      customer_name: name,
-      customer_phone: phone,
-    }),
-  });
-
-  if (res.ok) {
-    tg.HapticFeedback?.notificationOccurred('success');
-    applications = []; // keyingi safar "To'lovlarim" qayta yuklansin
-    tg.showAlert("Arizangiz qabul qilindi! Tez orada operatorimiz siz bilan bog'lanadi.", () => {
-      document.getElementById('sheet').classList.remove('open');
-      tg.MainButton.hide();
-    });
-  } else {
-    tg.showAlert('Xatolik yuz berdi, qayta urinib ko\'ring');
-  }
-});
-
-document.getElementById('sheet').onclick = (e) => {
-  if (e.target.id === 'sheet') {
-    document.getElementById('sheet').classList.remove('open');
-    tg?.MainButton.hide();
-  }
-};
+async function reloadProducts() {
+  try { state.products = await api('/api/products'); } catch (e) {}
+}
 
 // ---------- Ishga tushirish ----------
 
 async function init() {
-  await Promise.all([loadTerms(), loadCategories()]);
   render();
+  try {
+    const [terms, cats, products] = await Promise.all([
+      api('/api/installment-terms'), api('/api/categories'), api('/api/products'),
+    ]);
+    state.terms = terms; state.categories = cats; state.products = products;
+  } catch (e) {
+    $('#app').innerHTML = `<div class="page">${errorView(e.message)}</div>`;
+    bind();
+    return;
+  }
+  render();
+  if (inTelegram || SAME_ORIGIN) {
+    // Ikkinchi darajali ma'lumotlar — bosh sahifani kutib turmaydi
+    api('/api/me').then(me => { state.me = me; if (me.is_admin) loadAdminApps(); else render(); }).catch(() => {});
+    api('/api/applications').then(a => { state.applications = a; render(); }).catch(() => {});
+  }
+  api('/api/branches').then(b => { state.branches = b; }).catch(() => {});
 }
 init();
 </script>

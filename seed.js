@@ -6,7 +6,6 @@
 // Ishga tushirish: npm run seed (yoki server ishga tushganda avtomatik)
 
 const db = require('./db');
-const { TERM_OPTIONS } = require('./config');
 
 // ---------- Rasm generatori ----------
 // Haqiqiy telefon fotolarini ishlatmayapmiz, chunki ular Apple/Samsung/Xiaomi'ning
@@ -15,10 +14,20 @@ const { TERM_OPTIONS } = require('./config');
 // 1C bazasiga ulanganimizda, bu o'rniga haqiqiy fotolar keladi.
 function phoneImage(color) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'>
-    <rect width='240' height='240' rx='28' fill='#F2EDE2'/>
-    <rect x='82' y='34' width='76' height='172' rx='16' fill='${color}'/>
-    <rect x='90' y='48' width='60' height='128' rx='5' fill='#EDEDED' opacity='0.92'/>
-    <circle cx='120' cy='40' r='2.6' fill='#999'/>
+    <defs>
+      <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0' stop-color='#EEF4F1'/><stop offset='1' stop-color='#DCE8E2'/>
+      </linearGradient>
+      <linearGradient id='gl' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0' stop-color='#fff' stop-opacity='.55'/><stop offset='.5' stop-color='#fff' stop-opacity='0'/>
+      </linearGradient>
+    </defs>
+    <rect width='240' height='240' fill='url(#bg)'/>
+    <ellipse cx='120' cy='212' rx='46' ry='6' fill='#000' opacity='.08'/>
+    <rect x='80' y='28' width='80' height='178' rx='18' fill='${color}'/>
+    <rect x='86' y='34' width='68' height='166' rx='13' fill='#0E1512'/>
+    <rect x='86' y='34' width='68' height='166' rx='13' fill='url(#gl)'/>
+    <rect x='108' y='41' width='24' height='7' rx='3.5' fill='${color}'/>
   </svg>`;
   return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
 }
@@ -92,11 +101,10 @@ const insertProd = db.prepare(`
 `);
 
 const existingCount = db.prepare('SELECT COUNT(*) AS c FROM products').get().c;
-let insertedIds = {};
 if (existingCount === 0) {
   for (const p of products) {
     const color = colorFor(p.description, p.name, p.cat);
-    const result = insertProd.run({
+    insertProd.run({
       category_id: catIds[p.cat],
       model_group: p.group,
       name: p.name,
@@ -105,37 +113,8 @@ if (existingCount === 0) {
       price: p.price,
       image_url: phoneImage(color),
     });
-    insertedIds[p.name] = result.lastInsertRowid;
   }
   console.log(`${products.length} ta telefon qo'shildi.`);
 } else {
   console.log('Mahsulotlar allaqachon mavjud, seed o\'tkazib yuborildi.');
-}
-
-// ---------- Namuna to'lov yozuvi ("To'lovlarim" bo'limi qanday ko'rinishini ko'rsatish uchun) ----------
-// DIQQAT: bu haqiqiy ariza emas — barcha foydalanuvchilarga namuna sifatida ko'rinadi (is_demo=1).
-
-const demoCount = db.prepare('SELECT COUNT(*) AS c FROM applications WHERE is_demo = 1').get().c;
-if (demoCount === 0) {
-  const demoProduct = db.prepare("SELECT * FROM products WHERE name = 'iPhone 16 Pro Max 256GB' LIMIT 1").get();
-  if (demoProduct) {
-    const downPayment = 4720000; // ~$400 (kurs: 1$ ≈ 11 800 so'm) — haqiqiy voqea, min 30% dan sal past
-    const termMonths = 6;
-    const term = TERM_OPTIONS.find(t => t.months === termMonths);
-    const remaining = demoProduct.price - downPayment;
-    const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
-    const totalPrice = remainingWithMarkup + downPayment;
-    const monthly = Math.round(remainingWithMarkup / termMonths);
-
-    db.prepare(`
-      INSERT INTO applications
-        (telegram_id, customer_name, customer_phone, product_id, product_name, base_price, down_payment, term_months, monthly_payment, total_price, paid_installments, is_demo, status)
-      VALUES (0, 'Namuna mijoz', '+998900000000', ?, ?, ?, ?, ?, ?, ?, ?, 1, 'contacted')
-    `).run(
-      demoProduct.id, demoProduct.name, demoProduct.price, downPayment,
-      termMonths, monthly, totalPrice,
-      Math.round(termMonths / 2) // 6 oydan 3 tasi to'langan — "yarmi to'langan"
-    );
-    console.log("Namuna to'lov yozuvi qo'shildi (iPhone 16 Pro Max, yarmi to'langan).");
-  }
 }

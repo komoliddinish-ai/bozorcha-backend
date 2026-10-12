@@ -27,7 +27,7 @@ function calcInstallment(basePrice, months, downPayment) {
 
   const minDp = minDownPayment(basePrice);
   const dp = downPayment != null ? Number(downPayment) : minDp;
-  if (dp < minDp) return null; // boshlang'ich to'lov minimaldan kam bo'lishi mumkin emas
+  if (!Number.isFinite(dp) || dp < minDp || dp >= basePrice) return null; // kamida 30%, narxdan kam
 
   const remaining = basePrice - dp;
   const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
@@ -58,4 +58,23 @@ const BRANCHES = [
   { name: 'Chorsu filiali', address: 'Chorsu', phone: '+998 97 107 44 44' },
 ];
 
-module.exports = { TERM_OPTIONS, MIN_DOWN_PAYMENT_RATE, minDownPayment, calcInstallment, CALL_CENTER, BRANCHES };
+// ---------- Adminlar ----------
+// ADMIN_IDS — admin panelga kira oladigan Telegram ID'lar, vergul bilan: "123456,789012"
+// ADMIN_CHAT_ID — yangi arizalar yuboriladigan guruh/chat ID (ixtiyoriy).
+//   Berilmasa, xabar har bir adminga shaxsan yuboriladi.
+// O'z Telegram ID'ingizni @userinfobot orqali bilib olishingiz mumkin.
+
+const ADMIN_IDS = (process.env.ADMIN_IDS || '')
+  .split(',')
+  .map(s => Number(s.trim()))
+  .filter(Boolean);
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || null;
+
+function isAdmin(telegramId) {
+  return ADMIN_IDS.includes(Number(telegramId));
+}
+
+module.exports = {
+  TERM_OPTIONS, MIN_DOWN_PAYMENT_RATE, minDownPayment, calcInstallment,
+  CALL_CENTER, BRANCHES, ADMIN_IDS, ADMIN_CHAT_ID, isAdmin,
+};
