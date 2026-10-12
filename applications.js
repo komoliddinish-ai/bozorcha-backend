@@ -37,8 +37,10 @@ function normalizePhone(raw) {
   return `+998 ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 10)} ${digits.slice(10, 12)}`;
 }
 
+// 1540 -> "1 540 $", 103.333 -> "103.33 $"
 function money(v) {
-  return Number(v).toLocaleString('ru-RU').replace(/,/g, ' ') + " so'm";
+  const [int, dec] = (Math.round(Number(v) * 100) / 100).toFixed(2).split('.');
+  return int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (dec === '00' ? '' : '.' + dec) + ' $';
 }
 
 function escapeHtml(s) {

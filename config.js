@@ -9,6 +9,9 @@
 // Ustama = 0.05 × oylar soni + 0.10  (3 oy → 25%, 4 oy → 30%, ... 9 oy → 55%)
 // Bu formula Excel faylidagi B4:H7 va B22:F25 katakchalaridan chiqarib olindi.
 
+// Barcha summalar AQSh dollarida, sentgacha (2 xona) yaxlitlanadi.
+const round2 = (x) => Math.round(x * 100) / 100;
+
 const MIN_DOWN_PAYMENT_RATE = 0.30; // boshlang'ich to'lov kamida naqd narxining 30% bo'lishi kerak
 
 const TERM_OPTIONS = [3, 4, 5, 6, 7, 8, 9].map(months => ({
@@ -17,7 +20,7 @@ const TERM_OPTIONS = [3, 4, 5, 6, 7, 8, 9].map(months => ({
 }));
 
 function minDownPayment(basePrice) {
-  return Math.round(basePrice * MIN_DOWN_PAYMENT_RATE);
+  return round2(basePrice * MIN_DOWN_PAYMENT_RATE);
 }
 
 // downPayment berilmasa, minimal (30%) qiymat ishlatiladi
@@ -26,13 +29,13 @@ function calcInstallment(basePrice, months, downPayment) {
   if (!term) return null;
 
   const minDp = minDownPayment(basePrice);
-  const dp = downPayment != null ? Number(downPayment) : minDp;
+  const dp = downPayment != null ? round2(Number(downPayment)) : minDp;
   if (!Number.isFinite(dp) || dp < minDp || dp >= basePrice) return null; // kamida 30%, narxdan kam
 
   const remaining = basePrice - dp;
-  const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
-  const totalPrice = remainingWithMarkup + dp;
-  const monthly = Math.round(remainingWithMarkup / term.months);
+  const remainingWithMarkup = round2(remaining * (1 + term.markup));
+  const totalPrice = round2(remainingWithMarkup + dp);
+  const monthly = round2(remainingWithMarkup / term.months);
 
   return {
     months: term.months,

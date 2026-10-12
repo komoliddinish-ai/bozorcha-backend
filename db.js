@@ -38,7 +38,7 @@ db.exec(`
     name          TEXT NOT NULL,        -- to'liq nom, variant bilan (masalan "iPhone 17 Pro Max 256GB Qora")
     description   TEXT,
     condition     TEXT NOT NULL DEFAULT 'new',  -- 'new' (yangi) yoki 'used' (ishlatilgan)
-    price         INTEGER NOT NULL,      -- so'mda butun son sifatida
+    price         INTEGER NOT NULL,      -- AQSh dollarida (sentlar bilan bo'lishi mumkin)
     image_url     TEXT,
     stock         INTEGER DEFAULT 100,
     is_active     INTEGER DEFAULT 1
@@ -62,6 +62,27 @@ db.exec(`
     created_at        TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+// ---------- Valyuta: so'mdan dollarga bir martalik o'tish ----------
+// Dastlabki versiyada narxlar so'mda saqlangan. Bazada so'mdagi ma'lumot qolgan
+// bo'lsa, taxminiy kurs bo'yicha dollarga o'tkaziladi (namuna narxlar edi,
+// haqiqiy narxlarni admin paneldan to'g'rilang).
+db.exec('CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)');
+const currency = db.prepare("SELECT value FROM meta WHERE key = 'currency'").get();
+if (!currency) {
+  const UZS_PER_USD = 12000;
+  db.transaction(() => {
+    db.prepare(`UPDATE products SET price = MAX(10, ROUND(price / ${UZS_PER_USD} / 10.0) * 10)`).run();
+    db.prepare(`
+      UPDATE applications SET
+        base_price      = ROUND(base_price      / ${UZS_PER_USD}.0, 2),
+        down_payment    = ROUND(down_payment    / ${UZS_PER_USD}.0, 2),
+        monthly_payment = ROUND(monthly_payment / ${UZS_PER_USD}.0, 2),
+        total_price     = ROUND(total_price     / ${UZS_PER_USD}.0, 2)
+    `).run();
+    db.prepare("INSERT INTO meta (key, value) VALUES ('currency', 'USD')").run();
+  })();
+}
 
 // Eski versiyada barcha foydalanuvchilarga ko'rinadigan "Namuna mijoz" arizasi
 // qo'shilardi — haqiqiy mijozlarni chalg'itmasligi uchun o'chiramiz.

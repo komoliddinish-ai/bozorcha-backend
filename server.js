@@ -153,7 +153,7 @@ const PRODUCT_FIELDS = ['category_id', 'model_group', 'name', 'description', 'co
 function cleanProduct(body) {
   const out = {};
   for (const f of PRODUCT_FIELDS) if (body[f] !== undefined) out[f] = body[f];
-  if (out.price !== undefined) out.price = Math.round(Number(out.price));
+  if (out.price !== undefined) out.price = Math.round(Number(out.price) * 100) / 100;
   if (out.price !== undefined && !(out.price > 0)) return { error: "Narx noto'g'ri" };
   if (out.condition !== undefined && !['new', 'used'].includes(out.condition)) return { error: "Holat noto'g'ri" };
   if (out.is_active !== undefined) out.is_active = out.is_active ? 1 : 0;

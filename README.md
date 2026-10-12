@@ -57,4 +57,4 @@ DEV_SKIP_AUTH=1 ADMIN_IDS=1 npm start
 ## Keyingi bosqich: 1C
 
 Mijoz roziligidan so'ng `seed.js` dagi namuna mahsulotlar o'rniga 1C'dan
-mahsulotlar (narx, qoldiq, rasm) sinxronlanadi. Bo'lib to'lash formulasi `config.js` da.
+mahsulotlar (narx, qoldiq, rasm) sinxronlanadi. Bo'lib to'lash formulasi `config.js` da. Barcha narxlar AQSh dollarida.

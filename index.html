@@ -289,14 +289,14 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+// Narxlar AQSh dollarida: 1540 -> "1 540 $", 103.333 -> "103.33 $"
+const round2 = (x) => Math.round(x * 100) / 100;
 function money(v) {
-  return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + " so'm";
+  const [int, dec] = round2(Number(v)).toFixed(2).split('.');
+  return int.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0') + (dec === '00' ? '' : '.' + dec) + '\u00A0$';
 }
-function shortMoney(v) {
-  if (v >= 1e6) return (Math.round(v / 1e5) / 10).toString().replace('.', ',') + ' mln';
-  if (v >= 1e3) return Math.round(v / 1e3) + ' ming';
-  return String(v);
-}
+// Qisqa ko'rinish (kartochkalar uchun) — butun dollargacha
+const shortMoney = (v) => money(Math.round(v));
 function fmtDate(s) {
   if (!s) return '';
   const d = new Date(s.replace(' ', 'T') + 'Z');
@@ -538,14 +538,14 @@ let stack = ['home'];
 function calcPlan(basePrice, months, downPayment) {
   const term = state.terms.find(t => t.months === months);
   if (!term) return null;
-  const dp = downPayment ?? Math.round(basePrice * MIN_DOWN_PAYMENT_RATE);
+  const dp = downPayment ?? round2(basePrice * MIN_DOWN_PAYMENT_RATE);
   const remaining = basePrice - dp;
-  const remainingWithMarkup = Math.round(remaining * (1 + term.markup));
+  const remainingWithMarkup = round2(remaining * (1 + term.markup));
   return {
     months, markup: term.markup, downPayment: dp,
-    total: remainingWithMarkup + dp,
-    monthly: Math.round(remainingWithMarkup / months),
-    overpay: remainingWithMarkup - remaining,
+    total: round2(remainingWithMarkup + dp),
+    monthly: round2(remainingWithMarkup / months),
+    overpay: round2(remainingWithMarkup - remaining),
   };
 }
 const longestTerm = () => state.terms.length ? Math.max(...state.terms.map(t => t.months)) : null;
@@ -712,7 +712,7 @@ function catalogResults() {
           <div class="name">${esc(g.name)}</div>
           <div class="meta">${g.items.length > 1 ? `${g.items.length} ta variant · eng arzoni` : esc(cheapest.description || '')}</div>
           <div class="price">${money(g.min)}</div>
-          ${m ? `<span class="monthly">${shortMoney(m)}/oy dan</span>` : ''}
+          ${m ? `<span class="monthly">oyiga ${shortMoney(m)} dan</span>` : ''}
         </div>
       </button>`;
   }).join('')}</div>`;
@@ -735,7 +735,7 @@ function modelView() {
             <div class="name">${esc(p.name.replace(state.model, '').replace(/^[\s,]+/, '') || p.name)}</div>
             <div class="meta">${esc(p.description || '')}</div>
             <div class="price">${money(p.price)}</div>
-            ${m ? `<div class="monthly">oyiga ${money(m)} dan</div>` : ''}
+            ${m ? `<div class="monthly">oyiga ${shortMoney(m)} dan</div>` : ''}
           </div>
           <span class="muted">${icon('chev')}</span>
         </button>`;
@@ -881,7 +881,7 @@ function openProduct(id) {
 
 function currentPlan() {
   const p = sheet.product;
-  const dp = Math.max(Math.round(p.price * MIN_DOWN_PAYMENT_RATE), Math.round(p.price * sheet.dpPct / 100));
+  const dp = Math.max(round2(p.price * MIN_DOWN_PAYMENT_RATE), round2(p.price * sheet.dpPct / 100));
   return calcPlan(p.price, sheet.term, dp);
 }
 
@@ -1218,7 +1218,7 @@ function editProductHTML() {
     <label class="field"><span>To'liq nomi</span><div class="input"><input id="eName" value="${esc(e.name)}" placeholder="iPhone 17 Pro Max 256GB Qora"></div></label>
     <label class="field"><span>Tavsif</span><div class="input"><input id="eDesc" value="${esc(e.description || '')}" placeholder="256GB, Qora, Neverlock"></div></label>
     <label class="field"><span>Rasm havolasi (ixtiyoriy, https://…)</span><div class="input"><input id="eImg" type="url" value="${esc(/^https?:\/\//.test(e.image_url || '') ? e.image_url : '')}" placeholder="Bo'sh qolsa, rasm avtomatik chiziladi"></div></label>
-    <label class="field"><span>Naqd narxi (so'm)</span><div class="input"><input id="ePrice" type="text" inputmode="numeric" value="${e.price ? String(e.price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : ''}" placeholder="12 500 000"></div></label>
+    <label class="field"><span>Naqd narxi ($)</span><div class="input"><input id="ePrice" type="text" inputmode="decimal" value="${e.price ? esc(e.price) : ''}" placeholder="1250"></div></label>
     <div class="switch"><span>Katalogda ko'rinsin</span><input type="checkbox" id="eActive" ${e.is_active ? 'checked' : ''}></div>
     ${sheet.errors.form ? `<div class="hint-err" style="margin:4px">${esc(sheet.errors.form)}</div>` : ''}
     ${inTelegram ? '' : `<button class="btn block" id="saveBtn">${e.id ? 'Saqlash' : "Qo'shish"}</button>`}
@@ -1226,7 +1226,7 @@ function editProductHTML() {
 }
 function bindEditProduct() {
   const price = $('#ePrice');
-  price.oninput = () => { const d = price.value.replace(/\D/g, ''); price.value = d.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
+  price.oninput = () => { price.value = price.value.replace(/[^\d.,]/g, ''); };
   const btn = $('#saveBtn');
   if (btn) btn.onclick = saveProduct;
 }
@@ -1238,7 +1238,7 @@ async function saveProduct() {
     model_group: $('#eGroup').value.trim(),
     name: $('#eName').value.trim(),
     description: $('#eDesc').value.trim(),
-    price: Number($('#ePrice').value.replace(/\D/g, '')),
+    price: Number($('#ePrice').value.replace(/\s/g, '').replace(',', '.')),
     is_active: $('#eActive').checked ? 1 : 0,
     image_url: $('#eImg').value.trim() || null,
   };
