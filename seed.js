@@ -7,40 +7,9 @@
 
 const db = require('./db');
 
-// ---------- Rasm generatori ----------
-// Haqiqiy telefon fotolarini ishlatmayapmiz, chunki ular Apple/Samsung/Xiaomi'ning
-// mualliflik huquqi bilan himoyalangan rasmiy suratlari. Buning o'rniga har bir
-// mahsulot uchun uning rangiga mos, oddiy va toza ikonka-rasm yaratamiz.
-// 1C bazasiga ulanganimizda, bu o'rniga haqiqiy fotolar keladi.
-function phoneImage(color) {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'>
-    <defs>
-      <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
-        <stop offset='0' stop-color='#EEF4F1'/><stop offset='1' stop-color='#DCE8E2'/>
-      </linearGradient>
-      <linearGradient id='gl' x1='0' y1='0' x2='1' y2='1'>
-        <stop offset='0' stop-color='#fff' stop-opacity='.55'/><stop offset='.5' stop-color='#fff' stop-opacity='0'/>
-      </linearGradient>
-    </defs>
-    <rect width='240' height='240' fill='url(#bg)'/>
-    <ellipse cx='120' cy='212' rx='46' ry='6' fill='#000' opacity='.08'/>
-    <rect x='80' y='28' width='80' height='178' rx='18' fill='${color}'/>
-    <rect x='86' y='34' width='68' height='166' rx='13' fill='#0E1512'/>
-    <rect x='86' y='34' width='68' height='166' rx='13' fill='url(#gl)'/>
-    <rect x='108' y='41' width='24' height='7' rx='3.5' fill='${color}'/>
-  </svg>`;
-  return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
-}
-
-function colorFor(description, name, cat) {
-  const text = `${description || ''} ${name}`;
-  if (text.includes('Kumush')) return '#D8D8D8';
-  if (text.includes('Qora')) return '#141414';
-  if (text.includes("Ko'k")) return '#2F5D9E';
-  if (cat === 'iPhone') return '#1C1C1E';
-  if (cat === 'Samsung') return '#2B2F36';
-  return '#20232A'; // Xiaomi va boshqalar
-}
+// Rasmlar: image_url bo'sh qoldiriladi — mini app telefonning brendi, modeli va
+// rangiga qarab illyustratsiya chizadi. Haqiqiy foto kerak bo'lsa, admin panelda
+// "Rasm havolasi" maydoniga kiritiladi (1C ulanganda u yerdan keladi).
 
 const categories = ['iPhone', 'Samsung', 'Xiaomi'];
 const catIds = {};
@@ -96,14 +65,13 @@ const products = [
 ];
 
 const insertProd = db.prepare(`
-  INSERT INTO products (category_id, model_group, name, condition, description, price, image_url)
-  VALUES (@category_id, @model_group, @name, @condition, @description, @price, @image_url)
+  INSERT INTO products (category_id, model_group, name, condition, description, price)
+  VALUES (@category_id, @model_group, @name, @condition, @description, @price)
 `);
 
 const existingCount = db.prepare('SELECT COUNT(*) AS c FROM products').get().c;
 if (existingCount === 0) {
   for (const p of products) {
-    const color = colorFor(p.description, p.name, p.cat);
     insertProd.run({
       category_id: catIds[p.cat],
       model_group: p.group,
@@ -111,7 +79,6 @@ if (existingCount === 0) {
       condition: p.condition,
       description: p.description,
       price: p.price,
-      image_url: phoneImage(color),
     });
   }
   console.log(`${products.length} ta telefon qo'shildi.`);

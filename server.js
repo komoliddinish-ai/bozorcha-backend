@@ -157,6 +157,10 @@ function cleanProduct(body) {
   if (out.price !== undefined && !(out.price > 0)) return { error: "Narx noto'g'ri" };
   if (out.condition !== undefined && !['new', 'used'].includes(out.condition)) return { error: "Holat noto'g'ri" };
   if (out.is_active !== undefined) out.is_active = out.is_active ? 1 : 0;
+  if (out.image_url !== undefined) {
+    out.image_url = out.image_url ? String(out.image_url).trim() : null;
+    if (out.image_url && !/^https?:\/\/\S+$/.test(out.image_url)) return { error: "Rasm havolasi https:// bilan boshlanishi kerak" };
+  }
   for (const f of ['name', 'model_group', 'description']) if (out[f] !== undefined) out[f] = String(out[f]).trim();
   return { data: out };
 }

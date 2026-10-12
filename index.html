@@ -342,12 +342,152 @@ const ICONS = {
 };
 const icon = (name, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;
 
-// Rasmi yo'q mahsulotlar uchun (masalan admin yangi qo'shganda) oddiy rasm
-function placeholderImage() {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><rect width='240' height='240' fill='#E5EEE9'/><rect x='80' y='28' width='80' height='178' rx='18' fill='#2B3330'/><rect x='86' y='34' width='68' height='166' rx='13' fill='#0E1512'/><rect x='108' y='41' width='24' height='7' rx='3.5' fill='#2B3330'/></svg>`;
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+// ---------- Telefon rasmlari ----------
+// Haqiqiy foto bo'lmasa (admin rasm havolasini kiritmagan bo'lsa), telefonning
+// brendi, modeli va rangiga qarab chiroyli illyustratsiya chiziladi.
+
+const PHONE_COLORS = [
+  [/kumush|silver|oq\b|white/i, '#E2E3E6'],
+  [/qora|black/i, '#2B2B2E'],
+  [/ko'k|blue/i, '#3D5A80'],
+  [/titan|natural/i, '#BDB3A4'],
+  [/yashil|green/i, '#5E7F6E'],
+  [/sariq|orange/i, '#D9773A'],
+  [/pushti|pink/i, '#E6BFC8'],
+  [/binafsha|purple|lavender/i, '#8E7CB0'],
+];
+const DEFAULT_COLORS = ['#3D5A80', '#BDB3A4', '#2B2B2E', '#5E7F6E', '#8E7CB0', '#E2E3E6'];
+
+function phoneColor(p) {
+  const text = `${p.name} ${p.description || ''}`;
+  for (const [re, c] of PHONE_COLORS) if (re.test(text)) return c;
+  let h = 0;
+  for (const ch of p.model_group || p.name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return DEFAULT_COLORS[h % DEFAULT_COLORS.length];
 }
-const imgOf = (p) => p.image_url || placeholderImage();
+
+// a va b ranglarni t nisbatda aralashtiradi
+function mix(a, b, t) {
+  const pa = a.match(/\w\w/g).map(x => parseInt(x, 16));
+  const pb = b.match(/\w\w/g).map(x => parseInt(x, 16));
+  return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
+const isLight = (hex) => {
+  const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16));
+  return r * 0.299 + g * 0.587 + b * 0.114 > 150;
+};
+
+function cameraKind(p) {
+  const n = (p.model_group || p.name).toLowerCase();
+  if (n.includes('iphone')) {
+    if (!n.includes('pro')) return 'iphone-duo';
+    return /iphone 1[7-9]|iphone 2/.test(n) ? 'iphone-plateau' : 'iphone-pro';
+  }
+  if (n.includes('galaxy') || n.includes('samsung')) return n.includes('ultra') ? 'samsung-ultra' : 'samsung';
+  if (n.includes('redmi') || n.includes('poco')) return 'redmi';
+  return 'xiaomi';
+}
+
+function lens(cx, cy, r, ring) {
+  return `<circle cx='${cx}' cy='${cy}' r='${r + 2.4}' fill='${ring}'/>
+    <circle cx='${cx}' cy='${cy}' r='${r}' fill='#0A0A0C'/>
+    <circle cx='${cx}' cy='${cy}' r='${r * 0.58}' fill='url(#lens)'/>
+    <circle cx='${cx - r * 0.32}' cy='${cy - r * 0.32}' r='${r * 0.2}' fill='#fff' opacity='.55'/>`;
+}
+const flash = (cx, cy, r = 3) => `<circle cx='${cx}' cy='${cy}' r='${r}' fill='#F3EEDC'/><circle cx='${cx}' cy='${cy}' r='${r * 0.5}' fill='#E2D9B8'/>`;
+
+function cameras(kind, x, y, W, body) {
+  const mod = mix(body, isLight(body) ? '#FFFFFF' : '#FFFFFF', 0.1);
+  const modStroke = mix(body, '#000000', 0.18);
+  const ring = mix(body, '#000000', 0.45);
+  switch (kind) {
+    case 'iphone-plateau':
+      return `<rect x='${x + 5}' y='${y + 7}' width='${W - 10}' height='52' rx='15' fill='${mod}' stroke='${modStroke}' stroke-width='.8'/>
+        ${lens(x + 21, y + 21, 8.5, ring)}${lens(x + 21, y + 45, 8.5, ring)}${lens(x + 42, y + 33, 8.5, ring)}
+        ${flash(x + W - 20, y + 22)}<circle cx='${x + W - 20}' cy='${y + 44}' r='3' fill='#1A1A1C'/>`;
+    case 'iphone-pro':
+      return `<rect x='${x + 7}' y='${y + 7}' width='50' height='50' rx='14' fill='${mod}' stroke='${modStroke}' stroke-width='.8'/>
+        ${lens(x + 20, y + 20, 8.5, ring)}${lens(x + 20, y + 44, 8.5, ring)}${lens(x + 43, y + 32, 8.5, ring)}
+        ${flash(x + 43, y + 15, 2.8)}<circle cx='${x + 43}' cy='${y + 49}' r='2.8' fill='#1A1A1C'/>`;
+    case 'iphone-duo':
+      return `<rect x='${x + 8}' y='${y + 8}' width='28' height='52' rx='14' fill='${mod}' stroke='${modStroke}' stroke-width='.8'/>
+        ${lens(x + 22, y + 22, 8.5, ring)}${lens(x + 22, y + 46, 8.5, ring)}${flash(x + 44, y + 22, 2.8)}`;
+    case 'samsung-ultra':
+      return `${lens(x + 22, y + 20, 8, ring)}${lens(x + 22, y + 41, 8, ring)}${lens(x + 22, y + 62, 8, ring)}
+        ${lens(x + 42, y + 30, 6, ring)}${lens(x + 42, y + 52, 6, ring)}${flash(x + 42, y + 14, 2.4)}`;
+    case 'samsung':
+      return `${lens(x + 22, y + 20, 8, ring)}${lens(x + 22, y + 41, 8, ring)}${lens(x + 22, y + 62, 8, ring)}${flash(x + 38, y + 20, 2.4)}`;
+    case 'redmi':
+      return `<rect x='${x + 8}' y='${y + 8}' width='34' height='64' rx='11' fill='${mod}' stroke='${modStroke}' stroke-width='.8'/>
+        ${lens(x + 25, y + 25, 10, ring)}${lens(x + 25, y + 53, 7, ring)}${flash(x + 50, y + 18, 2.6)}`;
+    default:
+      return `<rect x='${x + 7}' y='${y + 7}' width='54' height='54' rx='13' fill='${mod}' stroke='${modStroke}' stroke-width='.8'/>
+        ${lens(x + 21, y + 21, 9, ring)}${lens(x + 47, y + 21, 9, ring)}${lens(x + 21, y + 47, 9, ring)}${flash(x + 47, y + 47, 3)}`;
+  }
+}
+
+const artCache = new Map();
+function phoneArt(p) {
+  const body = phoneColor(p);
+  const kind = cameraKind(p);
+  const key = body + kind;
+  if (artCache.has(key)) return artCache.get(key);
+
+  const light = isLight(body);
+  const isIphone = kind.startsWith('iphone');
+  const bg1 = mix(body, '#F6F8F7', light ? 0.55 : 0.86);
+  const bg2 = mix(body, '#DDE5E1', light ? 0.45 : 0.72);
+  const wallA = mix(body, '#7B9CFF', 0.55);
+  const wallB = mix(body, '#0C0E1A', 0.8);
+  const edge = light ? 'rgba(0,0,0,.10)' : 'rgba(255,255,255,.28)';
+
+  // Orqadagi telefon — old tomoni (ekran)
+  const fx = 108, fy = 34, fW = 86, fH = 176;
+  // Oldindagi telefon — orqa tomoni (kamera)
+  const bx = 44, by = 26, bW = 92, bH = 188;
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'>
+  <defs>
+    <radialGradient id='bg' cx='.5' cy='.35' r='.8'><stop offset='0' stop-color='${bg1}'/><stop offset='1' stop-color='${bg2}'/></radialGradient>
+    <linearGradient id='sheen' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='#fff' stop-opacity='${light ? 0.5 : 0.22}'/>
+      <stop offset='.45' stop-color='#fff' stop-opacity='0'/>
+      <stop offset='1' stop-color='#000' stop-opacity='${light ? 0.12 : 0.28}'/>
+    </linearGradient>
+    <linearGradient id='wall' x1='0' y1='0' x2='.6' y2='1'><stop offset='0' stop-color='${wallA}'/><stop offset='1' stop-color='${wallB}'/></linearGradient>
+    <radialGradient id='lens' cx='.4' cy='.4' r='.7'><stop offset='0' stop-color='#4A5D8A'/><stop offset='1' stop-color='#0A0A0C'/></radialGradient>
+    <filter id='sh' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='5'/></filter>
+  </defs>
+  <rect width='240' height='240' fill='url(#bg)'/>
+  <ellipse cx='124' cy='222' rx='78' ry='7' fill='#000' opacity='.22' filter='url(#sh)'/>
+
+  <g transform='rotate(7 ${fx + fW / 2} ${fy + fH / 2})'>
+    <rect x='${fx}' y='${fy}' width='${fW}' height='${fH}' rx='20' fill='${mix(body, '#000000', 0.15)}'/>
+    <rect x='${fx + 3.5}' y='${fy + 3.5}' width='${fW - 7}' height='${fH - 7}' rx='17' fill='url(#wall)'/>
+    <circle cx='${fx + 20}' cy='${fy + 120}' r='38' fill='${wallA}' opacity='.35'/>
+    <circle cx='${fx + 70}' cy='${fy + 60}' r='26' fill='#fff' opacity='.08'/>
+    ${isIphone
+      ? `<rect x='${fx + fW / 2 - 13}' y='${fy + 9}' width='26' height='8' rx='4' fill='#050505'/>`
+      : `<circle cx='${fx + fW / 2}' cy='${fy + 13}' r='3.4' fill='#050505'/>`}
+    <text x='${fx + fW / 2}' y='${fy + 50}' text-anchor='middle' font-family='-apple-system,Helvetica,Arial' font-size='20' font-weight='600' fill='#fff' opacity='.92'>9:41</text>
+  </g>
+
+  <g transform='rotate(-6 ${bx + bW / 2} ${by + bH / 2})'>
+    <rect x='${bx - 1.6}' y='${by + 52}' width='3' height='22' rx='1.5' fill='${mix(body, '#000000', 0.3)}'/>
+    <rect x='${bx}' y='${by}' width='${bW}' height='${bH}' rx='21' fill='${body}'/>
+    <rect x='${bx}' y='${by}' width='${bW}' height='${bH}' rx='21' fill='url(#sheen)'/>
+    <rect x='${bx + 0.8}' y='${by + 0.8}' width='${bW - 1.6}' height='${bH - 1.6}' rx='20.2' fill='none' stroke='${edge}' stroke-width='1.2'/>
+    ${cameras(kind, bx, by, bW, body)}
+  </g>
+</svg>`;
+  const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.replace(/\s+/g, ' '));
+  artCache.set(key, url);
+  return url;
+}
+
+// Admin haqiqiy foto havolasini kiritgan bo'lsa — o'sha, aks holda illyustratsiya.
+// (Eski bazadagi avtomatik SVG rasmlar e'tiborga olinmaydi.)
+const imgOf = (p) => (p.image_url && /^https?:\/\//.test(p.image_url)) ? p.image_url : phoneArt(p);
 
 // ---------- API ----------
 
@@ -1077,6 +1217,7 @@ function editProductHTML() {
     <label class="field"><span>Model (variantlarni guruhlaydi)</span><div class="input"><input id="eGroup" value="${esc(e.model_group)}" placeholder="iPhone 17 Pro Max"></div></label>
     <label class="field"><span>To'liq nomi</span><div class="input"><input id="eName" value="${esc(e.name)}" placeholder="iPhone 17 Pro Max 256GB Qora"></div></label>
     <label class="field"><span>Tavsif</span><div class="input"><input id="eDesc" value="${esc(e.description || '')}" placeholder="256GB, Qora, Neverlock"></div></label>
+    <label class="field"><span>Rasm havolasi (ixtiyoriy, https://…)</span><div class="input"><input id="eImg" type="url" value="${esc(/^https?:\/\//.test(e.image_url || '') ? e.image_url : '')}" placeholder="Bo'sh qolsa, rasm avtomatik chiziladi"></div></label>
     <label class="field"><span>Naqd narxi (so'm)</span><div class="input"><input id="ePrice" type="text" inputmode="numeric" value="${e.price ? String(e.price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') : ''}" placeholder="12 500 000"></div></label>
     <div class="switch"><span>Katalogda ko'rinsin</span><input type="checkbox" id="eActive" ${e.is_active ? 'checked' : ''}></div>
     ${sheet.errors.form ? `<div class="hint-err" style="margin:4px">${esc(sheet.errors.form)}</div>` : ''}
@@ -1099,6 +1240,7 @@ async function saveProduct() {
     description: $('#eDesc').value.trim(),
     price: Number($('#ePrice').value.replace(/\D/g, '')),
     is_active: $('#eActive').checked ? 1 : 0,
+    image_url: $('#eImg').value.trim() || null,
   };
   if (!body.model_group || !body.name || !body.price) {
     sheet.edit = { ...e, ...body };
